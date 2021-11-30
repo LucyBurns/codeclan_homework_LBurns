@@ -1,0 +1,124 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+# Import Files ----
+```{r}
+library(CodeClanData)
+```
+```{r}
+drinks_content
+```
+
+```{r}
+drinks_content <- drinks_content
+```
+
+# Question One ----
+
+```{r}
+# Glimpse the data 
+glimpse(drinks_content)
+```
+
+```{r}
+# Short representation of the data 
+# Data is 242 rows and 18 columns
+# Data contains mostly numeric and some character values
+# Data describes the make up of the Starbucks drinks
+str(drinks_content)
+```
+
+# Question Two ----
+
+```{r}
+# Select category, beverage, prep and calories
+#Drop any NAs found in the Calories column
+drinks_content %>%
+  select (Beverage_category, Beverage, Beverage_prep, Calories)  %>%
+  drop_na(Calories)
+```
+
+# Question Three ----
+
+```{r}
+# Calculate the calorie difference from 135 calories
+drinks_content %>%
+  mutate(calorie_diff = Calories - 135) 
+```
+
+# Question Four ----
+
+```{r}
+# Summarise drinks by category 
+# Display the top 3 groups
+drink_groups <- group_by(drinks_content, Beverage_category)
+
+summarise (drink_groups, Calories = mean(Calories)) %>%
+  arrange (desc(Calories)) %>%
+  head(3)
+```
+
+Smoothies, Frappuccino Blended Coffee and Signature Espresso Drinks are the 
+most calorific categories of drinks.
+
+```{r}
+# Summarise drinks by category 
+# Display the bottom 3 groups
+drink_groups <- group_by(drinks_content, Beverage_category)
+
+summarise (drink_groups, Calories = mean(Calories)) %>%
+  arrange (desc(Calories)) %>%
+  tail(3)
+```
+Classic Espresso Drinks, Shaken Iced Beverages and Coffee are the lowest
+calorie groups.
+
+# Question 5 ----
+```{r}
+# Summarise drinks by Beverage_prep 
+# Display the average number
+prep_groups <- group_by(drinks_content, Beverage_prep)
+
+summarise (prep_groups, Calories = mean(Calories)) %>%
+  arrange (desc(Calories)) 
+```
+
+# Question 6 ----
+
+```{r}
+# Find the overall mean for all drinks
+mean(drinks_content$Calories)
+```
+
+The overall mean is 193.8719
+Returning to the code from Question 5 - which are above this average?
+
+```{r}
+# Summarise drinks by Beverage_prep 
+# Display the average number
+prep_groups <- group_by(drinks_content, Beverage_prep)
+
+summarise (prep_groups, Calories = mean(Calories)) %>%
+  filter (Calories >= 193.8719) 
+```
+There are 5 drink preps with above average calories:
+  2% Milk
+  Grande Nonfat Milk
+  Soymilk
+  Venti Nonfat Milk
+  Whole Milk
+  
+# Question 7 ----
+
+```{r}
+# Summarise drinks by Beverage_prep 
+# Display the average number
+# Sort by the lowest first
+prep_groups <- group_by(drinks_content, Beverage_prep)
+
+summarise (prep_groups, Calories = mean(Calories)) %>%
+  arrange (Calories) 
+```
+The coffee type with the lowest calories is the solo drinks.
+Looks like it is the fat that causes all of the problems!
