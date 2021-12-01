@@ -39,6 +39,16 @@ drinks_content %>%
   drop_na(Calories)
 ```
 
+
+```{r}
+# From Homework Answers
+# let's check if there are any missing values 
+drinks_content %>%
+  select(Beverage_category, Beverage, Beverage_prep, Calories) %>%
+  filter(is.na(Calories)) %>%
+  summarise(count_of_missing_calories = n())
+```
+
 # Question Three ----
 
 ```{r}
@@ -58,6 +68,18 @@ summarise (drink_groups, Calories = mean(Calories)) %>%
   arrange (desc(Calories)) %>%
   head(3)
 ```
+
+```{r}
+# From Homework Answers
+most_calories <- drink_calories %>%
+  group_by(Beverage_category) %>%
+  summarise(mean_calories = mean(Calories)) %>%
+  arrange(desc(mean_calories)) %>%
+  head(3)
+
+most_calories
+```
+
 
 Smoothies, Frappuccino Blended Coffee and Signature Espresso Drinks are the 
 most calorific categories of drinks.
