@@ -7,11 +7,32 @@ output: html_notebook
 
 After you’ve read in the data and assigned it to a variable with a useful name, investigate it. Write down some ideas for what you could do to further investigate/clean this data using what you’ve learned today (no need to code it though, just jot down thoughts and ideas). Feel free to also write down any general thoughts you get looking at the data - this task is just to get you thinking about data and data cleaning/prepping.
 
+# Import the data ----
 ```{r}
+library(tidyverse)
+movies <-read_csv("movies.csv") %>% 
+head(movies)
+```
 
+```{r}
+dim(Movies)
+```
+
+```{r}
+ls(Movies)
 ```
 
 
+```{r}
+Movies %>%
+  summarise(count = sum(is.na(budget)))
+```
+
+
+
+
+
+The data has 13 columns and 4803 rows. A mix of numeric and character data with some values missing
 
 # Question 2 ----
 
