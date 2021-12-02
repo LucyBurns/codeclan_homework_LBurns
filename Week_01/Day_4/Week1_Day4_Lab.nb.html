@@ -215,262 +215,33 @@ pre code {
 
 
 <!-- rnb-text-begin -->
-<div id="question-1--" class="section level1">
-<h1>Question 1 —-</h1>
-<p>After you’ve read in the data and assigned it to a variable with a useful name, investigate it. Write down some ideas for what you could do to further investigate/clean this data using what you’ve learned today (no need to code it though, just jot down thoughts and ideas). Feel free to also write down any general thoughts you get looking at the data - this task is just to get you thinking about data and data cleaning/prepping.</p>
-</div>
-<div id="import-the-data--" class="section level1">
-<h1>Import the data —-</h1>
+<p>#Import and View Data</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeSh0aWR5dmVyc2UpXG5tb3ZpZXMgPC1yZWFkX2NzdihcIm1vdmllcy5jc3ZcIilcbmBgYCJ9 -->
-<pre class="r"><code>library(tidyverse)
-movies &lt;-read_csv(&quot;movies.csv&quot;)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="look-at-the-data" class="section level1">
-<h1>Look at the data</h1>
-<p>Using glimpse(), ls() and dim() Note: dim() does not add anything to glimpse()</p>
-<p>The data has 4,803 rows and 13 columns The data is a mix of characters and numbers</p>
-<p>The first two columns appear to be the same - would possibly need to do a check to see if this is the case for all of the data On further examination - the difference appears to be where the film is not originally written in English so the original_title gives the original name of the film and the title column is the translated version.</p>
-<p>The data does not appear to be sorted The budget field is formatted in a strange way THere are some gaps in the data The overview column is very long and perhaps useful for reference but not of any data use.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZ2xpbXBzZShtb3ZpZXMpXG5gYGAifQ== -->
-<pre class="r"><code>glimpse(movies)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShSWEtDRClcbmxpYnJhcnkoYmVlcHIpXG5saWJyYXJ5KHRpZHl2ZXJzZSlcbmxpYnJhcnkoQ29kZUNsYW5EYXRhKVxubGlicmFyeShkcGx5cilcbmBgYCJ9 -->
+<pre class="r"><code>library(RXKCD)
+library(beepr)
+library(tidyverse)
+library(CodeClanData)
+library(dplyr)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubHMobW92aWVzKVxuYGBgIn0= -->
-<pre class="r"><code>ls(movies)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2luZV9yYXRpbmdzIDwtIHJlYWRfY3N2KFwid2luZV9yYXRpbmdzLmNzdlwiKVxuYGBgIn0= -->
+<pre class="r"><code>wine_ratings &lt;- read_csv(&quot;wine_ratings.csv&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGltKG1vdmllcylcbmBgYCJ9 -->
-<pre class="r"><code>dim(movies)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZ2xpbXBzZSh3aW5lX3JhdGluZ3MpXG5gYGAifQ== -->
+<pre class="r"><code>glimpse(wine_ratings)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="question-2--" class="section level1">
-<h1>Question 2 —-</h1>
-<p>A lot of interesting stuff in there! But for now, we are only interested in the movies’ titles, their runtime as well as their budget. Select the three columns that contain this information and save them into a new variable called movies_selected. Hint: you will have to make a choice between original_title and title.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW92aWVzX3NlbGVjdGVkIDwtIG1vdmllcyAlPiUgXG4gIHNlbGVjdCh0aXRsZSxydW50aW1lLGJ1ZGdldClcbm1vdmllc19zZWxlY3RlZFxuYGBgIn0= -->
-<pre class="r"><code>movies_selected &lt;- movies %&gt;% 
-  select(title,runtime,budget)
-movies_selected</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="question-3--" class="section level1">
-<h1>Question 3 —-</h1>
-<p>Ok, now take your subsetted data movies_selected, and count the number of missing values in each column.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW92aWVzX3NlbGVjdGVkICU+JVxuICBzdW1tYXJpc2UgKGNvdW50PXN1bShpcy5uYSh0aXRsZSkpKVxuYGBgIn0= -->
-<pre class="r"><code>movies_selected %&gt;%
-  summarise (count=sum(is.na(title)))</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW92aWVzX3NlbGVjdGVkICU+JVxuICBzdW1tYXJpc2UgKGNvdW50PXN1bShpcy5uYShidWRnZXQpKSlcbmBgYCJ9 -->
-<pre class="r"><code>movies_selected %&gt;%
-  summarise (count=sum(is.na(budget)))</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW92aWVzX3NlbGVjdGVkICU+JVxuICBzdW1tYXJpc2UgKGNvdW50PXN1bShpcy5uYShydW50aW1lKSkpXG5gYGAifQ== -->
-<pre class="r"><code>movies_selected %&gt;%
-  summarise (count=sum(is.na(runtime)))</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Runtime has two NAs, budget and title have none</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI0NvcnJlY3Rpb24gLSB0YWtlbiBmcm9tIHRoZSBhbnN3ZXJzXG4jQnJpbmcgYWxsIG9mIHRoZSBjYWxjdWxhdGlvbnMgaW50byBvbmUgbGluZSBvZiBjb2RlXG5tb3ZpZXNfc2VsZWN0ZWQgJT4lIFxuICBzdW1tYXJpc2UobmFfcnVudGltZSA9IHN1bShpcy5uYShydW50aW1lKSksXG4gICAgICAgICAgICBuYV90aXRsZSA9IHN1bShpcy5uYSh0aXRsZSkpLFxuICAgICAgICAgICAgbmFfYnVkZ2V0ID0gc3VtKGlzLm5hKGJ1ZGdldCkpKVxuYGBgIn0= -->
-<pre class="r"><code>#Correction - taken from the answers
-#Bring all of the calculations into one line of code
-movies_selected %&gt;% 
-  summarise(na_runtime = sum(is.na(runtime)),
-            na_title = sum(is.na(title)),
-            na_budget = sum(is.na(budget)))</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI0Fib3ViYWtyJ3MgY29kZSAtIHdoaWNoIEkgcmVhbGx5IGxpa2Vcbm1pc3NpbmdfdmFsdWUgPC0gbW92aWVzX3NlbGVjdGVkICU+JSBcbiAgZmlsdGVyKGlzLm5hKHRpdGxlKXxpcy5uYShydW50aW1lKXxpcy5uYShidWRnZXQpKVxubWlzc2luZ192YWx1ZVxuYGBgIn0= -->
-<pre class="r"><code>#Aboubakr&#39;s code - which I really like
-missing_value &lt;- movies_selected %&gt;% 
-  filter(is.na(title)|is.na(runtime)|is.na(budget))
-missing_value</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="question-4--" class="section level1">
-<h1>Question 4 —-</h1>
-<p>There are not too many NAs, but there are actually quite a few movies with a runtime of 0 in this dataset. Since it’s impossible for a movie to have a runtime of 0, use the function na_if to convert runtimes of length 0 into NAs. Save this into a new variable called movies_runtime. Then count how many missing values there are now in the column runtime.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW92aWVzX3NlbGVjdGVkICU+JVxuICBtdXRhdGUgKG1vdmllc19ydW50aW1lID0gbmFfaWYocnVudGltZSwgXCIwXCIpKSAlPiUgXG4gIGFycmFuZ2UocnVudGltZSkgJT4lIFxuICBzdW1tYXJpc2UgKGNvdW50PXN1bShpcy5uYShydW50aW1lKSkpXG5gYGAifQ== -->
-<pre class="r"><code>movies_selected %&gt;%
-  mutate (movies_runtime = na_if(runtime, &quot;0&quot;)) %&gt;% 
-  arrange(runtime) %&gt;% 
-  summarise (count=sum(is.na(runtime)))</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI1Rha2VuIGZyb20gYW5zd2VyIHNoZWV0IC0gaXQgbG9va3MgbGlrZSBJIGhhdmVuJ3QgY3JlYXRlZCBhIG5ldyB0YWJsZVxuI0Fsc28gSSBkaWRuJ3QgbWFrZSB0aGUgMCBhIG51bWJlciAtIEkgaGF2ZSBpdCBhcyB0ZXh0XG5tb3ZpZXNfcnVudGltZSA8LSBtb3ZpZXNfc2VsZWN0ZWQgJT4lXG4gIG11dGF0ZShydW50aW1lID0gbmFfaWYocnVudGltZSwgMCkpXG5cbm1vdmllc19ydW50aW1lICU+JSBcbiAgc3VtbWFyaXNlKGNvdW50ID0gc3VtKGlzLm5hKHJ1bnRpbWUpKSlcbmBgYCJ9 -->
-<pre class="r"><code>#Taken from answer sheet - it looks like I haven&#39;t created a new table
-#Also I didn&#39;t make the 0 a number - I have it as text
-movies_runtime &lt;- movies_selected %&gt;%
-  mutate(runtime = na_if(runtime, 0))
 
-movies_runtime %&gt;% 
-  summarise(count = sum(is.na(runtime)))</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>There are now 2 missing values in the movies_runtime column</p>
-</div>
-<div id="question-5--" class="section level1">
-<h1>Question 5 —-</h1>
-<p>Impute the missing values in runtime with the median runtime using coalesce and save this into a new variable called movies_imputed. There should now be no missing values in the column runtime - check this to make sure.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW92aWVzX2ltcHV0ZWQgPC0gbW92aWVzX3NlbGVjdGVkICU+JVxuICBtdXRhdGUocnVudGltZSA9IGNvYWxlc2NlKHJ1bnRpbWUsbWVkaWFuKHJ1bnRpbWUsbmEucm0gPSBUUlVFKSkpICBcbiAjZmlsdGVyKGlzLm5hKHJ1bnRpbWUpKVxuYGBgIn0= -->
-<pre class="r"><code>movies_imputed &lt;- movies_selected %&gt;%
-  mutate(runtime = coalesce(runtime,median(runtime,na.rm = TRUE)))  
- #filter(is.na(runtime))</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI1Rha2VuIGZyb20gaG9tZXdvcmsgYW5zd2Vyc1xubW92aWVzX2ltcHV0ZWQgPC0gbW92aWVzX3J1bnRpbWUgJT4lICBcbiAgbXV0YXRlKHJ1bnRpbWUgPSBjb2FsZXNjZShydW50aW1lLCBtZWRpYW4ocnVudGltZSwgbmEucm0gPSBUUlVFKSkpXG5cbm1vdmllc19pbXB1dGVkICU+JSBcbiAgc3VtbWFyaXNlKGNvdW50ID0gc3VtKGlzLm5hKHJ1bnRpbWUpKSlcbmBgYCJ9 -->
-<pre class="r"><code>#Taken from homework answers
-movies_imputed &lt;- movies_runtime %&gt;%  
-  mutate(runtime = coalesce(runtime, median(runtime, na.rm = TRUE)))
-
-movies_imputed %&gt;% 
-  summarise(count = sum(is.na(runtime)))</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="question-6--" class="section level1">
-<h1>Question 6 —-</h1>
-<p>Finally, use the slice_min and slice_max functions on movies_imputed to get the movies with the 10 shortest and 10 longest runtimes.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5tb3ZpZXNfaW1wdXRlZCAlPiUgXG4gIG11dGF0ZShydW50aW1lID0gY29hbGVzY2UocnVudGltZSxtZWRpYW4ocnVudGltZSxuYS5ybSA9IFRSVUUpKSkgICU+JSBcbiAgc2xpY2VfbWF4KHJ1bnRpbWUsIG4gPSAxMClcbmBgYCJ9 -->
-<pre class="r"><code>
-movies_imputed %&gt;% 
-  mutate(runtime = coalesce(runtime,median(runtime,na.rm = TRUE)))  %&gt;% 
-  slice_max(runtime, n = 10)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW92aWVzX2ltcHV0ZWQgJT4lIFxuICBtdXRhdGUocnVudGltZSA9IGNvYWxlc2NlKHJ1bnRpbWUsbWVkaWFuKHJ1bnRpbWUsbmEucm0gPSBUUlVFKSkpICAlPiUgXG4gIHNsaWNlX21pbihydW50aW1lLCBuID0gMTApXG5gYGAifQ== -->
-<pre class="r"><code>movies_imputed %&gt;% 
-  mutate(runtime = coalesce(runtime,median(runtime,na.rm = TRUE)))  %&gt;% 
-  slice_min(runtime, n = 10)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI1Rha2VuIGZyb20gdGhlIGhvbWV3b3JrIGFuc3dlcnNcbiNMb29rcyBsaWtlIEkgd2FzIG1ha2luZyBpdCBhIGxpdHRsZSB0b28gbG9uZy13aW5kZWRcbm1vdmllc19pbXB1dGVkICU+JSBcbiAgc2xpY2VfbWluKHJ1bnRpbWUsIG4gPSAxMClcbmBgYCJ9 -->
-<pre class="r"><code>#Taken from the homework answers
-#Looks like I was making it a little too long-winded
-movies_imputed %&gt;% 
-  slice_min(runtime, n = 10)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW92aWVzX2ltcHV0ZWQgJT4lIFxuICBzbGljZV9tYXgocnVudGltZSwgbiA9IDEwKVxuYGBgIn0= -->
-<pre class="r"><code>movies_imputed %&gt;% 
-  slice_max(runtime, n = 10)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="question-7--" class="section level1">
-<h1>Question 7 —-</h1>
-<p>Using the if_else function, impute anything with a budget below $100 with the median budget. Overwrite your movies_imputed so it contains the new budget values.</p>
-<p>I know I am going wrong with this bit of code - so going to leave it until we have the answers to work out where I am going wrong</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI0Fuc3dlciB0YWtlbiBmcm9tIGhvbWV3b3JrIGFuc3dlcnNcbm1vdmllc19pbXB1dGVkIDwtIG1vdmllc19pbXB1dGVkICU+JSBcbiAgbXV0YXRlKGJ1ZGdldCA9IGlmX2Vsc2UoYnVkZ2V0IDwgMTAwLCBtZWRpYW4oYnVkZ2V0KSwgYnVkZ2V0KSlcbmBgYCJ9 -->
-<pre class="r"><code>#Answer taken from homework answers
-movies_imputed &lt;- movies_imputed %&gt;% 
-  mutate(budget = if_else(budget &lt; 100, median(budget), budget))</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="extension--" class="section level1">
-<h1>Extension —-</h1>
-</div>
-<div id="question-1---1" class="section level1">
-<h1>Question 1 —-</h1>
-<p>Using case_when, create a new column called budget_type and label budgets as follows:</p>
-<p>Budgets below 12 million as ‘Small budget’ Budgets between 12 and 40 million as ‘Medium budget’ Budgets 40 millions and above as ‘Big budget’ Save this into a new variable called movie_budgets.</p>
-<p>Hint:1e6 is a shorthand way of writing 1 million (1×106)</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI1Rha2VuIGZyb20gaG9tZXdvcmsgc29sdXRpb25zXG5tb3ZpZV9idWRnZXRzIDwtIG1vdmllc19pbXB1dGVkICU+JVxuICBtdXRhdGUoXG4gICAgYnVkZ2V0X3R5cGUgPSBjYXNlX3doZW4oXG4gICAgICBidWRnZXQgPCAxMmU2IH4gXCJTbWFsbCBidWRnZXRcIixcbiAgICAgIGJ1ZGdldCA8IDQwZTYgfiBcIk1lZGl1bSBidWRnZXRcIixcbiAgICAgIGJ1ZGdldCA+PSA0MGU2IH4gXCJCaWcgYnVkZ2V0XCJcbiAgICAgIClcbiAgICApXG5cbm1vdmllX2J1ZGdldHNcbmBgYCJ9 -->
-<pre class="r"><code>#Taken from homework solutions
-movie_budgets &lt;- movies_imputed %&gt;%
-  mutate(
-    budget_type = case_when(
-      budget &lt; 12e6 ~ &quot;Small budget&quot;,
-      budget &lt; 40e6 ~ &quot;Medium budget&quot;,
-      budget &gt;= 40e6 ~ &quot;Big budget&quot;
-      )
-    )
-
-movie_budgets</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="question-2---1" class="section level1">
-<h1>Question 2 —-</h1>
-<p>Take the original dataset with all the variables. Using across and where, summarise the number of missing values, first across all columns of type character, and then across all columns of type numeric.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW92aWVzICU+JVxuICBzdW1tYXJpc2UoYWNyb3NzKHdoZXJlKGlzLm51bWVyaWMpLCB+c3VtKGlzLm5hKC54KSkpKVxuYGBgIn0= -->
-<pre class="r"><code>movies %&gt;%
-  summarise(across(where(is.numeric), ~sum(is.na(.x))))</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-</div>
-
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKIyBRdWVzdGlvbiAxIC0tLS0KCkFmdGVyIHlvdeKAmXZlIHJlYWQgaW4gdGhlIGRhdGEgYW5kIGFzc2lnbmVkIGl0IHRvIGEgdmFyaWFibGUgd2l0aCBhIHVzZWZ1bCBuYW1lLCBpbnZlc3RpZ2F0ZSBpdC4gV3JpdGUgZG93biBzb21lIGlkZWFzIGZvciB3aGF0IHlvdSBjb3VsZCBkbyB0byBmdXJ0aGVyIGludmVzdGlnYXRlL2NsZWFuIHRoaXMgZGF0YSB1c2luZyB3aGF0IHlvdeKAmXZlIGxlYXJuZWQgdG9kYXkgKG5vIG5lZWQgdG8gY29kZSBpdCB0aG91Z2gsIGp1c3Qgam90IGRvd24gdGhvdWdodHMgYW5kIGlkZWFzKS4gRmVlbCBmcmVlIHRvIGFsc28gd3JpdGUgZG93biBhbnkgZ2VuZXJhbCB0aG91Z2h0cyB5b3UgZ2V0IGxvb2tpbmcgYXQgdGhlIGRhdGEgLSB0aGlzIHRhc2sgaXMganVzdCB0byBnZXQgeW91IHRoaW5raW5nIGFib3V0IGRhdGEgYW5kIGRhdGEgY2xlYW5pbmcvcHJlcHBpbmcuCgojIEltcG9ydCB0aGUgZGF0YSAtLS0tCmBgYHtyfQpsaWJyYXJ5KHRpZHl2ZXJzZSkKbW92aWVzIDwtcmVhZF9jc3YoIm1vdmllcy5jc3YiKQpgYGAKCiMgTG9vayBhdCB0aGUgZGF0YQoKVXNpbmcgZ2xpbXBzZSgpLCBscygpIGFuZCBkaW0oKQpOb3RlOiBkaW0oKSBkb2VzIG5vdCBhZGQgYW55dGhpbmcgdG8gZ2xpbXBzZSgpCgpUaGUgZGF0YSBoYXMgNCw4MDMgcm93cyBhbmQgMTMgY29sdW1ucwpUaGUgZGF0YSBpcyBhIG1peCBvZiBjaGFyYWN0ZXJzIGFuZCBudW1iZXJzCgpUaGUgZmlyc3QgdHdvIGNvbHVtbnMgYXBwZWFyIHRvIGJlIHRoZSBzYW1lIC0gd291bGQgcG9zc2libHkgbmVlZCB0byBkbyBhIApjaGVjayB0byBzZWUgaWYgdGhpcyBpcyB0aGUgY2FzZSBmb3IgYWxsIG9mIHRoZSBkYXRhCiAgICBPbiBmdXJ0aGVyIGV4YW1pbmF0aW9uIC0gdGhlIGRpZmZlcmVuY2UgYXBwZWFycyB0byBiZSB3aGVyZSB0aGUgZmlsbQogICAgaXMgbm90IG9yaWdpbmFsbHkgd3JpdHRlbiBpbiBFbmdsaXNoIHNvIHRoZSBvcmlnaW5hbF90aXRsZSBnaXZlcwogICAgdGhlIG9yaWdpbmFsIG5hbWUgb2YgdGhlIGZpbG0gYW5kIHRoZSB0aXRsZSBjb2x1bW4gaXMgdGhlIHRyYW5zbGF0ZWQKICAgIHZlcnNpb24uCiAgICAKVGhlIGRhdGEgZG9lcyBub3QgYXBwZWFyIHRvIGJlIHNvcnRlZApUaGUgYnVkZ2V0IGZpZWxkIGlzIGZvcm1hdHRlZCBpbiBhIHN0cmFuZ2Ugd2F5ClRIZXJlIGFyZSBzb21lIGdhcHMgaW4gdGhlIGRhdGEKVGhlIG92ZXJ2aWV3IGNvbHVtbiBpcyB2ZXJ5IGxvbmcgYW5kIHBlcmhhcHMgdXNlZnVsIGZvciByZWZlcmVuY2UgYnV0IG5vdCAKb2YgYW55IGRhdGEgdXNlLgoKCmBgYHtyfQpnbGltcHNlKG1vdmllcykKYGBgCgpgYGB7cn0KbHMobW92aWVzKQpgYGAKCmBgYHtyfQpkaW0obW92aWVzKQpgYGAKCiMgUXVlc3Rpb24gMiAtLS0tCgpBIGxvdCBvZiBpbnRlcmVzdGluZyBzdHVmZiBpbiB0aGVyZSEgQnV0IGZvciBub3csIHdlIGFyZSBvbmx5IGludGVyZXN0ZWQgaW4gdGhlIG1vdmllc+KAmSB0aXRsZXMsIHRoZWlyIHJ1bnRpbWUgYXMgd2VsbCBhcyB0aGVpciBidWRnZXQuIFNlbGVjdCB0aGUgdGhyZWUgY29sdW1ucyB0aGF0IGNvbnRhaW4gdGhpcyBpbmZvcm1hdGlvbiBhbmQgc2F2ZSB0aGVtIGludG8gYSBuZXcgdmFyaWFibGUgY2FsbGVkIG1vdmllc19zZWxlY3RlZC4gSGludDogeW91IHdpbGwgaGF2ZSB0byBtYWtlIGEgY2hvaWNlIGJldHdlZW4gb3JpZ2luYWxfdGl0bGUgYW5kIHRpdGxlLgoKYGBge3J9Cm1vdmllc19zZWxlY3RlZCA8LSBtb3ZpZXMgJT4lIAogIHNlbGVjdCh0aXRsZSxydW50aW1lLGJ1ZGdldCkKbW92aWVzX3NlbGVjdGVkCmBgYAoKCgojIFF1ZXN0aW9uIDMgLS0tLQoKT2ssIG5vdyB0YWtlIHlvdXIgc3Vic2V0dGVkIGRhdGEgbW92aWVzX3NlbGVjdGVkLCBhbmQgY291bnQgdGhlIG51bWJlciBvZiBtaXNzaW5nIHZhbHVlcyBpbiBlYWNoIGNvbHVtbi4KCmBgYHtyfQptb3ZpZXNfc2VsZWN0ZWQgJT4lCiAgc3VtbWFyaXNlIChjb3VudD1zdW0oaXMubmEodGl0bGUpKSkKYGBgCgpgYGB7cn0KbW92aWVzX3NlbGVjdGVkICU+JQogIHN1bW1hcmlzZSAoY291bnQ9c3VtKGlzLm5hKGJ1ZGdldCkpKQpgYGAKCmBgYHtyfQptb3ZpZXNfc2VsZWN0ZWQgJT4lCiAgc3VtbWFyaXNlIChjb3VudD1zdW0oaXMubmEocnVudGltZSkpKQpgYGAKClJ1bnRpbWUgaGFzIHR3byBOQXMsIGJ1ZGdldCBhbmQgdGl0bGUgaGF2ZSBub25lCgpgYGB7cn0KI0NvcnJlY3Rpb24gLSB0YWtlbiBmcm9tIHRoZSBhbnN3ZXJzCiNCcmluZyBhbGwgb2YgdGhlIGNhbGN1bGF0aW9ucyBpbnRvIG9uZSBsaW5lIG9mIGNvZGUKbW92aWVzX3NlbGVjdGVkICU+JSAKICBzdW1tYXJpc2UobmFfcnVudGltZSA9IHN1bShpcy5uYShydW50aW1lKSksCiAgICAgICAgICAgIG5hX3RpdGxlID0gc3VtKGlzLm5hKHRpdGxlKSksCiAgICAgICAgICAgIG5hX2J1ZGdldCA9IHN1bShpcy5uYShidWRnZXQpKSkKYGBgCgpgYGB7cn0KI0Fib3ViYWtyJ3MgY29kZSAtIHdoaWNoIEkgcmVhbGx5IGxpa2UKbWlzc2luZ192YWx1ZSA8LSBtb3ZpZXNfc2VsZWN0ZWQgJT4lIAogIGZpbHRlcihpcy5uYSh0aXRsZSl8aXMubmEocnVudGltZSl8aXMubmEoYnVkZ2V0KSkKbWlzc2luZ192YWx1ZQpgYGAKCgoKIyBRdWVzdGlvbiA0IC0tLS0KClRoZXJlIGFyZSBub3QgdG9vIG1hbnkgTkFzLCBidXQgdGhlcmUgYXJlIGFjdHVhbGx5IHF1aXRlIGEgZmV3IG1vdmllcyB3aXRoIGEgcnVudGltZSBvZiAwIGluIHRoaXMgZGF0YXNldC4gU2luY2UgaXTigJlzIGltcG9zc2libGUgZm9yIGEgbW92aWUgdG8gaGF2ZSBhIHJ1bnRpbWUgb2YgMCwgdXNlIHRoZSBmdW5jdGlvbiBuYV9pZiB0byBjb252ZXJ0IHJ1bnRpbWVzIG9mIGxlbmd0aCAwIGludG8gTkFzLiBTYXZlIHRoaXMgaW50byBhIG5ldyB2YXJpYWJsZSBjYWxsZWQgbW92aWVzX3J1bnRpbWUuIFRoZW4gY291bnQgaG93IG1hbnkgbWlzc2luZyB2YWx1ZXMgdGhlcmUgYXJlIG5vdyBpbiB0aGUgY29sdW1uIHJ1bnRpbWUuCgpgYGB7cn0KbW92aWVzX3NlbGVjdGVkICU+JQogIG11dGF0ZSAobW92aWVzX3J1bnRpbWUgPSBuYV9pZihydW50aW1lLCAiMCIpKSAlPiUgCiAgYXJyYW5nZShydW50aW1lKSAlPiUgCiAgc3VtbWFyaXNlIChjb3VudD1zdW0oaXMubmEocnVudGltZSkpKQpgYGAKCmBgYHtyfQojVGFrZW4gZnJvbSBhbnN3ZXIgc2hlZXQgLSBpdCBsb29rcyBsaWtlIEkgaGF2ZW4ndCBjcmVhdGVkIGEgbmV3IHRhYmxlCiNBbHNvIEkgZGlkbid0IG1ha2UgdGhlIDAgYSBudW1iZXIgLSBJIGhhdmUgaXQgYXMgdGV4dAptb3ZpZXNfcnVudGltZSA8LSBtb3ZpZXNfc2VsZWN0ZWQgJT4lCiAgbXV0YXRlKHJ1bnRpbWUgPSBuYV9pZihydW50aW1lLCAwKSkKCm1vdmllc19ydW50aW1lICU+JSAKICBzdW1tYXJpc2UoY291bnQgPSBzdW0oaXMubmEocnVudGltZSkpKQpgYGAKCgpUaGVyZSBhcmUgbm93IDIgbWlzc2luZyB2YWx1ZXMgaW4gdGhlIG1vdmllc19ydW50aW1lIGNvbHVtbgoKIyBRdWVzdGlvbiA1IC0tLS0KCkltcHV0ZSB0aGUgbWlzc2luZyB2YWx1ZXMgaW4gcnVudGltZSB3aXRoIHRoZSBtZWRpYW4gcnVudGltZSB1c2luZyBjb2FsZXNjZSBhbmQgc2F2ZSB0aGlzIGludG8gYSBuZXcgdmFyaWFibGUgY2FsbGVkIG1vdmllc19pbXB1dGVkLiBUaGVyZSBzaG91bGQgbm93IGJlIG5vIG1pc3NpbmcgdmFsdWVzIGluIHRoZSBjb2x1bW4gcnVudGltZSAtIGNoZWNrIHRoaXMgdG8gbWFrZSBzdXJlLgoKYGBge3J9Cm1vdmllc19pbXB1dGVkIDwtIG1vdmllc19zZWxlY3RlZCAlPiUKICBtdXRhdGUocnVudGltZSA9IGNvYWxlc2NlKHJ1bnRpbWUsbWVkaWFuKHJ1bnRpbWUsbmEucm0gPSBUUlVFKSkpICAKICNmaWx0ZXIoaXMubmEocnVudGltZSkpCmBgYAoKYGBge3J9CiNUYWtlbiBmcm9tIGhvbWV3b3JrIGFuc3dlcnMKbW92aWVzX2ltcHV0ZWQgPC0gbW92aWVzX3J1bnRpbWUgJT4lICAKICBtdXRhdGUocnVudGltZSA9IGNvYWxlc2NlKHJ1bnRpbWUsIG1lZGlhbihydW50aW1lLCBuYS5ybSA9IFRSVUUpKSkKCm1vdmllc19pbXB1dGVkICU+JSAKICBzdW1tYXJpc2UoY291bnQgPSBzdW0oaXMubmEocnVudGltZSkpKQpgYGAKCgojIFF1ZXN0aW9uIDYgLS0tLQoKRmluYWxseSwgdXNlIHRoZSBzbGljZV9taW4gYW5kIHNsaWNlX21heCBmdW5jdGlvbnMgb24gbW92aWVzX2ltcHV0ZWQgdG8gZ2V0IHRoZSBtb3ZpZXMgd2l0aCB0aGUgMTAgc2hvcnRlc3QgYW5kIDEwIGxvbmdlc3QgcnVudGltZXMuCgpgYGB7cn0KCm1vdmllc19pbXB1dGVkICU+JSAKICBtdXRhdGUocnVudGltZSA9IGNvYWxlc2NlKHJ1bnRpbWUsbWVkaWFuKHJ1bnRpbWUsbmEucm0gPSBUUlVFKSkpICAlPiUgCiAgc2xpY2VfbWF4KHJ1bnRpbWUsIG4gPSAxMCkKYGBgCgpgYGB7cn0KbW92aWVzX2ltcHV0ZWQgJT4lIAogIG11dGF0ZShydW50aW1lID0gY29hbGVzY2UocnVudGltZSxtZWRpYW4ocnVudGltZSxuYS5ybSA9IFRSVUUpKSkgICU+JSAKICBzbGljZV9taW4ocnVudGltZSwgbiA9IDEwKQpgYGAKCmBgYHtyfQojVGFrZW4gZnJvbSB0aGUgaG9tZXdvcmsgYW5zd2VycwojTG9va3MgbGlrZSBJIHdhcyBtYWtpbmcgaXQgYSBsaXR0bGUgdG9vIGxvbmctd2luZGVkCm1vdmllc19pbXB1dGVkICU+JSAKICBzbGljZV9taW4ocnVudGltZSwgbiA9IDEwKQpgYGAKCmBgYHtyfQptb3ZpZXNfaW1wdXRlZCAlPiUgCiAgc2xpY2VfbWF4KHJ1bnRpbWUsIG4gPSAxMCkKYGBgCgoKCiMgUXVlc3Rpb24gNyAtLS0tCgoKVXNpbmcgdGhlIGlmX2Vsc2UgZnVuY3Rpb24sIGltcHV0ZSBhbnl0aGluZyB3aXRoIGEgYnVkZ2V0IGJlbG93ICQxMDAgd2l0aCB0aGUgbWVkaWFuIGJ1ZGdldC4gCk92ZXJ3cml0ZSB5b3VyIG1vdmllc19pbXB1dGVkIHNvIGl0IGNvbnRhaW5zIHRoZSBuZXcgYnVkZ2V0IHZhbHVlcy4KCkkga25vdyBJIGFtIGdvaW5nIHdyb25nIHdpdGggdGhpcyBiaXQgb2YgY29kZSAtIHNvIGdvaW5nIHRvIGxlYXZlIGl0IHVudGlsIHdlIGhhdmUgdGhlIAphbnN3ZXJzIHRvIHdvcmsgb3V0IHdoZXJlIEkgYW0gZ29pbmcgd3JvbmcKCmBgYHtyfQojQW5zd2VyIHRha2VuIGZyb20gaG9tZXdvcmsgYW5zd2Vycwptb3ZpZXNfaW1wdXRlZCA8LSBtb3ZpZXNfaW1wdXRlZCAlPiUgCiAgbXV0YXRlKGJ1ZGdldCA9IGlmX2Vsc2UoYnVkZ2V0IDwgMTAwLCBtZWRpYW4oYnVkZ2V0KSwgYnVkZ2V0KSkKYGBgCgoKIyBFeHRlbnNpb24gLS0tLQoKCiMgUXVlc3Rpb24gMSAtLS0tCgpVc2luZyBjYXNlX3doZW4sIGNyZWF0ZSBhIG5ldyBjb2x1bW4gY2FsbGVkIGJ1ZGdldF90eXBlIGFuZCBsYWJlbCBidWRnZXRzIGFzIGZvbGxvd3M6CgpCdWRnZXRzIGJlbG93IDEyIG1pbGxpb24gYXMg4oCYU21hbGwgYnVkZ2V04oCZCkJ1ZGdldHMgYmV0d2VlbiAxMiBhbmQgNDAgbWlsbGlvbiBhcyDigJhNZWRpdW0gYnVkZ2V04oCZCkJ1ZGdldHMgNDAgbWlsbGlvbnMgYW5kIGFib3ZlIGFzIOKAmEJpZyBidWRnZXTigJkKU2F2ZSB0aGlzIGludG8gYSBuZXcgdmFyaWFibGUgY2FsbGVkIG1vdmllX2J1ZGdldHMuCgpIaW50OjFlNiBpcyBhIHNob3J0aGFuZCB3YXkgb2Ygd3JpdGluZyAxIG1pbGxpb24gKDHDlzEwNikKCgpgYGB7cn0KI1Rha2VuIGZyb20gaG9tZXdvcmsgc29sdXRpb25zCm1vdmllX2J1ZGdldHMgPC0gbW92aWVzX2ltcHV0ZWQgJT4lCiAgbXV0YXRlKAogICAgYnVkZ2V0X3R5cGUgPSBjYXNlX3doZW4oCiAgICAgIGJ1ZGdldCA8IDEyZTYgfiAiU21hbGwgYnVkZ2V0IiwKICAgICAgYnVkZ2V0IDwgNDBlNiB+ICJNZWRpdW0gYnVkZ2V0IiwKICAgICAgYnVkZ2V0ID49IDQwZTYgfiAiQmlnIGJ1ZGdldCIKICAgICAgKQogICAgKQoKbW92aWVfYnVkZ2V0cwpgYGAKCgojIFF1ZXN0aW9uIDIgLS0tLQoKVGFrZSB0aGUgb3JpZ2luYWwgZGF0YXNldCB3aXRoIGFsbCB0aGUgdmFyaWFibGVzLiBVc2luZyBhY3Jvc3MgYW5kIHdoZXJlLCBzdW1tYXJpc2UgdGhlIG51bWJlciBvZiBtaXNzaW5nIHZhbHVlcywgZmlyc3QgYWNyb3NzIGFsbCBjb2x1bW5zIG9mIHR5cGUgY2hhcmFjdGVyLCBhbmQgdGhlbiBhY3Jvc3MgYWxsIGNvbHVtbnMgb2YgdHlwZSBudW1lcmljLgoKYGBge3J9Cm1vdmllcyAlPiUKICBzdW1tYXJpc2UoYWNyb3NzKHdoZXJlKGlzLm51bWVyaWMpLCB+c3VtKGlzLm5hKC54KSkpKQpgYGAKCg==</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQojSW1wb3J0IGFuZCBWaWV3IERhdGEKCmBgYHtyfQpsaWJyYXJ5KFJYS0NEKQpsaWJyYXJ5KGJlZXByKQpsaWJyYXJ5KHRpZHl2ZXJzZSkKbGlicmFyeShDb2RlQ2xhbkRhdGEpCmxpYnJhcnkoZHBseXIpCmBgYAoKYGBge3J9CndpbmVfcmF0aW5ncyA8LSByZWFkX2Nzdigid2luZV9yYXRpbmdzLmNzdiIpCmBgYAoKYGBge3J9CmdsaW1wc2Uod2luZV9yYXRpbmdzKQpgYGA=</div>
 
 
 
@@ -517,7 +288,7 @@ $(document).ready(function () {
 <!-- code folding -->
 <script>
 $(document).ready(function () {
-  window.initializeSourceEmbed("Movie_Homework_LucyBurns.Rmd");
+  window.initializeSourceEmbed("Week1_Day4_Lab.Rmd");
   window.initializeCodeFolding("show" === "show");
 });
 </script>

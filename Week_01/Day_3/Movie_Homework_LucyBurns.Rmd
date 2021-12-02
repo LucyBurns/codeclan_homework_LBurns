@@ -89,6 +89,12 @@ movies_selected %>%
             na_budget = sum(is.na(budget)))
 ```
 
+```{r}
+#Aboubakr's code - which I really like
+missing_value <- movies_selected %>% 
+  filter(is.na(title)|is.na(runtime)|is.na(budget))
+missing_value
+```
 
 
 

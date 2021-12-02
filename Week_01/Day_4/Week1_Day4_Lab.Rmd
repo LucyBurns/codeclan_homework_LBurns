@@ -1,0 +1,21 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+#Import and View Data
+
+```{r}
+library(RXKCD)
+library(beepr)
+library(tidyverse)
+library(CodeClanData)
+library(dplyr)
+```
+
+```{r}
+wine_ratings <- read_csv("wine_ratings.csv")
+```
+
+```{r}
+glimpse(wine_ratings)
+```
