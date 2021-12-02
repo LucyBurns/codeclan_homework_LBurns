@@ -227,21 +227,191 @@ library(dplyr)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+<div id="error-1--" class="section level1">
+<h1>Error 1 —-</h1>
+<p>Create some_letters which is a character vector containing the following letters: “E”, “R”, “R”, “O” and “R”.</p>
+<pre><code>                  ^</code></pre>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2luZV9yYXRpbmdzIDwtIHJlYWRfY3N2KFwid2luZV9yYXRpbmdzLmNzdlwiKVxuYGBgIn0= -->
-<pre class="r"><code>wine_ratings &lt;- read_csv(&quot;wine_ratings.csv&quot;)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc29tZV9sZXR0ZXJzIDwtIGMoXCJFXCIsIFwiUlwiLCBcIlJcIiwgXCJPXCIsIFwiUlwiKVxuIyNFcnJvcjogPHRleHQ+OjE6MjE6IHVuZXhwZWN0ZWQgJywnXG4jIyAxOiBzb21lX2xldHRlcnMgPC0gKFwiRVwiLFxuIyMgICBcbmBgYCJ9 -->
+<pre class="r"><code>some_letters &lt;- c(&quot;E&quot;, &quot;R&quot;, &quot;R&quot;, &quot;O&quot;, &quot;R&quot;)
+##Error: &lt;text&gt;:1:21: unexpected &#39;,&#39;
+## 1: some_letters &lt;- (&quot;E&quot;,
+##   </code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="error-2--" class="section level1">
+<h1>Error 2 —-</h1>
+<p>Create message which is a vector containing the following strings: “does”, “this”, “work” and “?”, then convert the vector to uppercase using toupper.</p>
+<p>message &lt;- c(“does”, “this” “work”, “?”)</p>
+<pre><code>                          ^</code></pre>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubWVzc2FnZSA8LSBjKFwiZG9lc1wiLCBcInRoaXNcIiwgXCJ3b3JrXCIsIFwiP1wiKVxudG91cHBlcihtZXNzYWdlKVxuYGBgIn0= -->
+<pre class="r"><code>message &lt;- c(&quot;does&quot;, &quot;this&quot;, &quot;work&quot;, &quot;?&quot;)
+toupper(message)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiRE9FU1wiIFwiVEhJU1wiIFwiV09SS1wiIFwiP1wiICAgXG4ifQ== -->
+<pre><code>[1] &quot;DOES&quot; &quot;THIS&quot; &quot;WORK&quot; &quot;?&quot;   </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMgRXJyb3I6IDx0ZXh0PjoxOjI5OiB1bmV4cGVjdGVkIHN0cmluZyBjb25zdGFudFxuIyMgMTogbWVzc2FnZSA8LSBjKFwiZG9lc1wiLCBcInRoaXNcIiBcIndvcmtcIlxuIyMgICBcbmBgYCJ9 -->
+<pre class="r"><code>## Error: &lt;text&gt;:1:29: unexpected string constant
+## 1: message &lt;- c(&quot;does&quot;, &quot;this&quot; &quot;work&quot;
+##   </code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="error-3" class="section level1">
+<h1>Error 3</h1>
+<p>Select columns mpg, cyl, and disp from mtcars and keep only rows where mpg is less than 20..</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXRjYXJzICU+JSBcbiAgc2VsZWN0KG1wZywgY3lsLCBkaXNwKSAlPiVcbiAgZmlsdGVyKG1wZyA8IDIwKVxuIyMgRXJyb3IgaW4gbXRjYXJzICU+JSBzZWxlY3QobXBnLCBjeWwsIGRpc3ApICU+PiUgZmlsdGVyKG1wZyA8IDIwKTogY291bGQgbm90IGZpbmQgZnVuY3Rpb24gXCIlPj4lXCIgICBcbmBgYCJ9 -->
+<pre class="r"><code>mtcars %&gt;% 
+  select(mpg, cyl, disp) %&gt;%
+  filter(mpg &lt; 20)
+## Error in mtcars %&gt;% select(mpg, cyl, disp) %&gt;&gt;% filter(mpg &lt; 20): could not find function &quot;%&gt;&gt;%&quot;   </code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="error-4--" class="section level1">
+<h1>Error 4 —-</h1>
+<p>Select columns Sepal.Length, Sepal.Width, and Species and arrange by Sepal Length.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaXJpcyAlPiUgXG4gIHNlbGVjdChTZXBhbC5MZW5ndGgsIFNlcGFsLldpZHRoLCBTcGVjaWVzKSAlPiUgXG4gIGFycmFuZ2UoU2VwYWwuTGVuZ3RoKVxuIyMgRXJyb3IgaW4gaXJpcyAlPiUgc2VsZWN0KFNlcGFsLldpZHRoLCBTcGVjaWVzKSAlPiUgYXJyYW5nZShTZXBhbC5MZW5ndGgpOiBjb3VsZCBub3QgZmluZCBmdW5jdGlvbiBcIiU+JVwiXG4gICAgICAgICAgICAgXG5gYGAifQ== -->
+<pre class="r"><code>iris %&gt;% 
+  select(Sepal.Length, Sepal.Width, Species) %&gt;% 
+  arrange(Sepal.Length)
+## Error in iris %&gt;% select(Sepal.Width, Species) %&gt;% arrange(Sepal.Length): could not find function &quot;%&gt;%&quot;
+             </code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="error-5--" class="section level1">
+<h1>Error 5 —-</h1>
+<p>Find the average tooth length for where the supplement is vitamin C.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVG9vdGhHcm93dGggJT4lXG4gIGdyb3VwX2J5KHN1cHApICU+JVxuICBzdW1tYXJpc2UoYXZnX2xlbl92YyA9IG1lYW4obGVuKSkgJT4lIFxuICBmaWx0ZXIoc3VwcCA9PSBcIlZDXCIpXG4jIyBFcnJvciBpbiBUb290aEdyb3d0aCAlPiUgc3VtbWFyaXNlKGF2Z19sZW5fdmMgPSBtZWFuKGxlbikpICU+JSBmaWx0ZXIoc3VwcCA9PSA6IGNvdWxkIG5vdCBmaW5kIGZ1bmN0aW9uIFwiJT4lXCJcbmBgYCJ9 -->
+<pre class="r"><code>ToothGrowth %&gt;%
+  group_by(supp) %&gt;%
+  summarise(avg_len_vc = mean(len)) %&gt;% 
+  filter(supp == &quot;VC&quot;)
+## Error in ToothGrowth %&gt;% summarise(avg_len_vc = mean(len)) %&gt;% filter(supp == : could not find function &quot;%&gt;%&quot;</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="error-6--" class="section level1">
+<h1>Error 6 —-</h1>
+<p>Create a vector of animals (cat, dog, rabbit, horse), then use the sample function to get 10 random animals from those categories.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYW5pbWFscyA8LSBjKFwiY2F0XCIsIFwiZG9nXCIsIFwicmFiYml0XCIsIFwiaG9yc2VcIilcbiMjIEVycm9yIGluIGV2YWwoZXhwciwgZW52aXIsIGVuY2xvcyk6IG9iamVjdCAnZG9nJyBub3QgZm91bmRcbnNhbXBsZShhbmltYWxzLCAxMCwgcmVwbGFjZSA9IFRSVUUpXG5gYGAifQ== -->
+<pre class="r"><code>animals &lt;- c(&quot;cat&quot;, &quot;dog&quot;, &quot;rabbit&quot;, &quot;horse&quot;)
+## Error in eval(expr, envir, enclos): object &#39;dog&#39; not found
+sample(animals, 10, replace = TRUE)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSBcInJhYmJpdFwiIFwiZG9nXCIgICAgXCJkb2dcIiAgICBcImhvcnNlXCIgIFwiZG9nXCIgICAgXCJob3JzZVwiICBcImhvcnNlXCIgIFwicmFiYml0XCIgXCJob3JzZVwiICBcImRvZ1wiICAgXG4ifQ== -->
+<pre><code> [1] &quot;rabbit&quot; &quot;dog&quot;    &quot;dog&quot;    &quot;horse&quot;  &quot;dog&quot;    &quot;horse&quot;  &quot;horse&quot;  &quot;rabbit&quot; &quot;horse&quot;  &quot;dog&quot;   </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMgRXJyb3IgaW4gc2FtcGxlKGFuaW1hbHMsIDEwKTogb2JqZWN0ICdhbmltYWxzJyBub3QgZm91bmRcbmBgYCJ9 -->
+<pre class="r"><code>## Error in sample(animals, 10): object &#39;animals&#39; not found</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="error-7--" class="section level1">
+<h1>Error 7 —-</h1>
+<p>Create dog_names and cat_names, then use intersect to check which common pet names are shared by both dogs and cats.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZG9nX25hbWVzIDwtIGMoXCJMdWN5XCIsIFwiTW9sbHlcIiwgXCJDaGFybGllXCIsIFwiTHVuYVwiLCBcIkJlbGxhXCIsIFwiQ29vcGVyXCIpXG5cbmNhdF9uYW1lcyA8LSBjKFwiTHVuYVwiLCBcIkxpbHlcIiwgXCJMdWN5XCIsIFwiQ2hhcmxpZVwiLCBcIk1heFwiLCBcIk9saXZlclwiKVxuIyMgRXJyb3IgaW4gZXZhbChleHByLCBlbnZpciwgZW5jbG9zKTogb2JqZWN0ICdjYXRfbmFtZXMnIG5vdCBmb3VuZFxuaW50ZXJzZWN0KGRvZ19uYW1lcywgY2F0X25hbWVzKVxuIyMgRXJyb3IgaW4gSW50ZXJzZWN0KGRvZ19uYW1lcyk6IGNvdWxkIG5vdCBmaW5kIGZ1bmN0aW9uIFwiSW50ZXJzZWN0XCJcbmBgYCJ9 -->
+<pre class="r"><code>dog_names &lt;- c(&quot;Lucy&quot;, &quot;Molly&quot;, &quot;Charlie&quot;, &quot;Luna&quot;, &quot;Bella&quot;, &quot;Cooper&quot;)
+
+cat_names &lt;- c(&quot;Luna&quot;, &quot;Lily&quot;, &quot;Lucy&quot;, &quot;Charlie&quot;, &quot;Max&quot;, &quot;Oliver&quot;)
+## Error in eval(expr, envir, enclos): object &#39;cat_names&#39; not found
+intersect(dog_names, cat_names)
+## Error in Intersect(dog_names): could not find function &quot;Intersect&quot;</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="error-8--" class="section level1">
+<h1>Error 8 —-</h1>
+<p>Filter weights equal to or below 150 grams, then create a new column ‘weight_kg’ that contains the weight in kilograms.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2hpY2t3dHMgJT4lIFxuICBmaWx0ZXIod2VpZ2h0IDw9IDE1MCkgJT4lIFxuICBtdXRhdGUod2VpZ2h0X2tnID0gd2VpZ2h0ICogMC4wMDEpXG4jIyBFcnJvcjogPHRleHQ+OjI6MTg6IHVuZXhwZWN0ZWQgJzwnXG4jIyAxOiBjaGlja3d0cyAlPiUgXG4jIyAyOiAgIGZpbHRlcih3ZWlnaHQgPTxcbiMjICAgIFxuYGBgIn0= -->
+<pre class="r"><code>chickwts %&gt;% 
+  filter(weight &lt;= 150) %&gt;% 
+  mutate(weight_kg = weight * 0.001)
+## Error: &lt;text&gt;:2:18: unexpected &#39;&lt;&#39;
+## 1: chickwts %&gt;% 
+## 2:   filter(weight =&lt;
+##    </code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="error-9--" class="section level1">
+<h1>Error 9 —-</h1>
+<p>Create a tibble with column alphabet which contains the English alphabet and column numbers which has a unique number for each letter. Then remove rows where the letter is A, B or C.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGliYmxlKGFscGhhYmV0ID0gTEVUVEVSUyxcbiAgICAgICBudW1iZXJzID0gMToyNikgJT4lIFxuICBmaWx0ZXIoYWxwaGFiZXQgIT0gYyhcIkFcIiwgXCJCXCIsIFwiQ1wiKSlcbiMjIEVycm9yIGluIHRpYmJsZShhbHBoYWJldCA9IExFVFRFUlMoKSwgbnVtYmVycyA9IDE6MjUpICU+JSBmaWx0ZXIobGV0dGVyICE9IDogY291bGQgbm90IGZpbmQgZnVuY3Rpb24gXCIlPiVcIlxuYGBgIn0= -->
+<pre class="r"><code>tibble(alphabet = LETTERS,
+       numbers = 1:26) %&gt;% 
+  filter(alphabet != c(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;))
+## Error in tibble(alphabet = LETTERS(), numbers = 1:25) %&gt;% filter(letter != : could not find function &quot;%&gt;%&quot;</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="error-10--" class="section level1">
+<h1>Error 10 —-</h1>
+<p>The chunk below creates the data for this error (don’t change anything in it): Don’t change anything in this code chunk but you will need to include it in your notebooks</p>
+<p>set.seed(999)</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2NlbnRfcmF0aW5ncyA8LSB0aWJibGUoXG4gIGlEID0gcmVwKDE6MTAsIGVhY2ggPSA1KSxcbiAgU0NFTlQgPSByZXAoYyhcIk5ldyBib29rXCIsIFwiQ3V0IGdyYXNzXCIsIFwiUm9zZSBvaWxcIiwgXCJGcmVzaCBsaW5lblwiLCBcIldldCBkb2dcIiksIDEwKSxcbiAgcmF0aW5nID0gc2FtcGxlKGMoMDo1LCBOQSksIDUwLCByZXBsYWNlID0gVFJVRSksXG4gIFBlcnNvbkFnZSA9IHJlcChOQSwgNTApXG4pXG5gYGAifQ== -->
+<pre class="r"><code>scent_ratings &lt;- tibble(
+  iD = rep(1:10, each = 5),
+  SCENT = rep(c(&quot;New book&quot;, &quot;Cut grass&quot;, &quot;Rose oil&quot;, &quot;Fresh linen&quot;, &quot;Wet dog&quot;), 10),
+  rating = sample(c(0:5, NA), 50, replace = TRUE),
+  PersonAge = rep(NA, 50)
+)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZ2xpbXBzZSh3aW5lX3JhdGluZ3MpXG5gYGAifQ== -->
-<pre class="r"><code>glimpse(wine_ratings)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMgRXJyb3IgaW4gdGliYmxlKGlEID0gcmVwKDE6MTAsIGVhY2ggPSA1KSwgU0NFTlQgPSByZXAoYyhcIk5ldyBib29rXCIsIFwiQ3V0IGdyYXNzXCIsIDogY291bGQgbm90IGZpbmQgZnVuY3Rpb24gXCJ0aWJibGVcIlxuXG4jI0NsZWFuIHRoZSB2YXJpYWJsZSBuYW1lcyBhbmQgZHJvcCBtaXNzaW5nIHJhdGluZ3MgZnJvbSBzY2VudF9yYXRpbmdzIGFuZCBjYWxjdWxhdGUgYW4gYXZlcmFnZSByYXRpbmcgcGVyIHNjZW50LlxuXG5zY2VudF9yYXRpbmdzX25ldyA8LSBzY2VudF9yYXRpbmdzICU+JSBcbiAgamFuaXRvcjo6Y2xlYW5fbmFtZXMoKVxuXG4jIyBFcnJvciBpbiBzY2VudF9yYXRpbmdzICU+JSBqYW5pdG9yOmNsZWFuX25hbWVzKCk6IGNvdWxkIG5vdCBmaW5kIGZ1bmN0aW9uIFwiJT4lXCJcbnNjZW50X3JhdGluZ3NfbmV3ICU+JSBcbiAgc2VsZWN0KGlfZCwgc2NlbnQsIHJhdGluZykgJT4lIFxuICBkcm9wX25hKCkgJT4lIFxuICBncm91cF9ieShzY2VudCkgJT4lIFxuICBzdW1tYXJpc2UobWVhbl9yYXRpbmcgPSBtZWFuKHJhdGluZykpXG4jIyBFcnJvciBpbiBzY2VudF9yYXRpbmdzICU+JSBkcm9wX25hKCkgJT4lIGdyb3VwX2J5KHNjZW50KSAlPiUgc3VtbWFyaXNlKG1lYW5fcmF0aW5nID0gbWVhbigpKTogY291bGQgbm90IGZpbmQgZnVuY3Rpb24gXCIlPiVcIlxuYGBgIn0= -->
+<pre class="r"><code>## Error in tibble(iD = rep(1:10, each = 5), SCENT = rep(c(&quot;New book&quot;, &quot;Cut grass&quot;, : could not find function &quot;tibble&quot;
+
+##Clean the variable names and drop missing ratings from scent_ratings and calculate an average rating per scent.
+
+scent_ratings_new &lt;- scent_ratings %&gt;% 
+  janitor::clean_names()
+
+## Error in scent_ratings %&gt;% janitor:clean_names(): could not find function &quot;%&gt;%&quot;
+scent_ratings_new %&gt;% 
+  select(i_d, scent, rating) %&gt;% 
+  drop_na() %&gt;% 
+  group_by(scent) %&gt;% 
+  summarise(mean_rating = mean(rating))
+## Error in scent_ratings %&gt;% drop_na() %&gt;% group_by(scent) %&gt;% summarise(mean_rating = mean()): could not find function &quot;%&gt;%&quot;</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
+</div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQojSW1wb3J0IGFuZCBWaWV3IERhdGEKCmBgYHtyfQpsaWJyYXJ5KFJYS0NEKQpsaWJyYXJ5KGJlZXByKQpsaWJyYXJ5KHRpZHl2ZXJzZSkKbGlicmFyeShDb2RlQ2xhbkRhdGEpCmxpYnJhcnkoZHBseXIpCmBgYAoKYGBge3J9CndpbmVfcmF0aW5ncyA8LSByZWFkX2Nzdigid2luZV9yYXRpbmdzLmNzdiIpCmBgYAoKYGBge3J9CmdsaW1wc2Uod2luZV9yYXRpbmdzKQpgYGA=</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQojSW1wb3J0IGFuZCBWaWV3IERhdGEKCmBgYHtyfQpsaWJyYXJ5KFJYS0NEKQpsaWJyYXJ5KGJlZXByKQpsaWJyYXJ5KHRpZHl2ZXJzZSkKbGlicmFyeShDb2RlQ2xhbkRhdGEpCmxpYnJhcnkoZHBseXIpCmBgYAoKIyBFcnJvciAxIC0tLS0KCkNyZWF0ZSBzb21lX2xldHRlcnMgd2hpY2ggaXMgYSBjaGFyYWN0ZXIgdmVjdG9yIGNvbnRhaW5pbmcgdGhlIGZvbGxvd2luZyBsZXR0ZXJzOiDigJxF4oCdLCDigJxS4oCdLCDigJxS4oCdLCDigJxP4oCdIGFuZCDigJxS4oCdLgoKICAgICAgICAgICAgICAgICAgICAgIF4KYGBge3J9CnNvbWVfbGV0dGVycyA8LSBjKCJFIiwgIlIiLCAiUiIsICJPIiwgIlIiKQojI0Vycm9yOiA8dGV4dD46MToyMTogdW5leHBlY3RlZCAnLCcKIyMgMTogc29tZV9sZXR0ZXJzIDwtICgiRSIsCiMjICAgCmBgYAoKIyBFcnJvciAyIC0tLS0KCkNyZWF0ZSBtZXNzYWdlIHdoaWNoIGlzIGEgdmVjdG9yIGNvbnRhaW5pbmcgdGhlIGZvbGxvd2luZyBzdHJpbmdzOiDigJxkb2Vz4oCdLCDigJx0aGlz4oCdLCDigJx3b3Jr4oCdIGFuZCDigJw/4oCdLCB0aGVuIGNvbnZlcnQgdGhlIHZlY3RvciB0byB1cHBlcmNhc2UgdXNpbmcgdG91cHBlci4KCm1lc3NhZ2UgPC0gYygiZG9lcyIsICJ0aGlzIiAid29yayIsICI/IikKCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KYGBge3J9Cm1lc3NhZ2UgPC0gYygiZG9lcyIsICJ0aGlzIiwgIndvcmsiLCAiPyIpCnRvdXBwZXIobWVzc2FnZSkKIyMgRXJyb3I6IDx0ZXh0PjoxOjI5OiB1bmV4cGVjdGVkIHN0cmluZyBjb25zdGFudAojIyAxOiBtZXNzYWdlIDwtIGMoImRvZXMiLCAidGhpcyIgIndvcmsiCiMjICAgCmBgYAoKIyBFcnJvciAzCgpTZWxlY3QgY29sdW1ucyBtcGcsIGN5bCwgYW5kIGRpc3AgZnJvbSBtdGNhcnMgYW5kIGtlZXAgb25seSByb3dzIHdoZXJlIG1wZyBpcyBsZXNzIHRoYW4gMjAuLgoKYGBge3J9Cm10Y2FycyAlPiUgCiAgc2VsZWN0KG1wZywgY3lsLCBkaXNwKSAlPiUKICBmaWx0ZXIobXBnIDwgMjApCiMjIEVycm9yIGluIG10Y2FycyAlPiUgc2VsZWN0KG1wZywgY3lsLCBkaXNwKSAlPj4lIGZpbHRlcihtcGcgPCAyMCk6IGNvdWxkIG5vdCBmaW5kIGZ1bmN0aW9uICIlPj4lIiAgIApgYGAKICAgICAgICAgICAgICAgICAKIyBFcnJvciA0IC0tLS0KU2VsZWN0IGNvbHVtbnMgU2VwYWwuTGVuZ3RoLCBTZXBhbC5XaWR0aCwgYW5kIFNwZWNpZXMgYW5kIGFycmFuZ2UgYnkgU2VwYWwgTGVuZ3RoLgoKYGBge3J9CmlyaXMgJT4lIAogIHNlbGVjdChTZXBhbC5MZW5ndGgsIFNlcGFsLldpZHRoLCBTcGVjaWVzKSAlPiUgCiAgYXJyYW5nZShTZXBhbC5MZW5ndGgpCiMjIEVycm9yIGluIGlyaXMgJT4lIHNlbGVjdChTZXBhbC5XaWR0aCwgU3BlY2llcykgJT4lIGFycmFuZ2UoU2VwYWwuTGVuZ3RoKTogY291bGQgbm90IGZpbmQgZnVuY3Rpb24gIiU+JSIKICAgICAgICAgICAgIApgYGAKCiMgRXJyb3IgNSAtLS0tCgpGaW5kIHRoZSBhdmVyYWdlIHRvb3RoIGxlbmd0aCBmb3Igd2hlcmUgdGhlIHN1cHBsZW1lbnQgaXMgdml0YW1pbiBDLgoKYGBge3J9ClRvb3RoR3Jvd3RoICU+JQogIGdyb3VwX2J5KHN1cHApICU+JQogIHN1bW1hcmlzZShhdmdfbGVuX3ZjID0gbWVhbihsZW4pKSAlPiUgCiAgZmlsdGVyKHN1cHAgPT0gIlZDIikKIyMgRXJyb3IgaW4gVG9vdGhHcm93dGggJT4lIHN1bW1hcmlzZShhdmdfbGVuX3ZjID0gbWVhbihsZW4pKSAlPiUgZmlsdGVyKHN1cHAgPT0gOiBjb3VsZCBub3QgZmluZCBmdW5jdGlvbiAiJT4lIgpgYGAKCiMgRXJyb3IgNiAtLS0tCkNyZWF0ZSBhIHZlY3RvciBvZiBhbmltYWxzIChjYXQsIGRvZywgcmFiYml0LCBob3JzZSksIHRoZW4gdXNlIHRoZSBzYW1wbGUgZnVuY3Rpb24gdG8gZ2V0IDEwIHJhbmRvbSBhbmltYWxzIGZyb20gdGhvc2UgY2F0ZWdvcmllcy4KCmBgYHtyfQphbmltYWxzIDwtIGMoImNhdCIsICJkb2ciLCAicmFiYml0IiwgImhvcnNlIikKIyMgRXJyb3IgaW4gZXZhbChleHByLCBlbnZpciwgZW5jbG9zKTogb2JqZWN0ICdkb2cnIG5vdCBmb3VuZApzYW1wbGUoYW5pbWFscywgMTAsIHJlcGxhY2UgPSBUUlVFKQojIyBFcnJvciBpbiBzYW1wbGUoYW5pbWFscywgMTApOiBvYmplY3QgJ2FuaW1hbHMnIG5vdCBmb3VuZApgYGAKCiMgRXJyb3IgNyAtLS0tCkNyZWF0ZSBkb2dfbmFtZXMgYW5kIGNhdF9uYW1lcywgdGhlbiB1c2UgaW50ZXJzZWN0IHRvIGNoZWNrIHdoaWNoIGNvbW1vbiBwZXQgbmFtZXMgYXJlIHNoYXJlZCBieSBib3RoIGRvZ3MgYW5kIGNhdHMuCgpgYGB7cn0KZG9nX25hbWVzIDwtIGMoIkx1Y3kiLCAiTW9sbHkiLCAiQ2hhcmxpZSIsICJMdW5hIiwgIkJlbGxhIiwgIkNvb3BlciIpCgpjYXRfbmFtZXMgPC0gYygiTHVuYSIsICJMaWx5IiwgIkx1Y3kiLCAiQ2hhcmxpZSIsICJNYXgiLCAiT2xpdmVyIikKIyMgRXJyb3IgaW4gZXZhbChleHByLCBlbnZpciwgZW5jbG9zKTogb2JqZWN0ICdjYXRfbmFtZXMnIG5vdCBmb3VuZAppbnRlcnNlY3QoZG9nX25hbWVzLCBjYXRfbmFtZXMpCiMjIEVycm9yIGluIEludGVyc2VjdChkb2dfbmFtZXMpOiBjb3VsZCBub3QgZmluZCBmdW5jdGlvbiAiSW50ZXJzZWN0IgpgYGAKCgoKIyBFcnJvciA4IC0tLS0KRmlsdGVyIHdlaWdodHMgZXF1YWwgdG8gb3IgYmVsb3cgMTUwIGdyYW1zLCB0aGVuIGNyZWF0ZSBhIG5ldyBjb2x1bW4g4oCYd2VpZ2h0X2tn4oCZIHRoYXQgY29udGFpbnMgdGhlIHdlaWdodCBpbiBraWxvZ3JhbXMuCgogICAgICAgICAgICAgICAgIApgYGB7cn0KY2hpY2t3dHMgJT4lIAogIGZpbHRlcih3ZWlnaHQgPD0gMTUwKSAlPiUgCiAgbXV0YXRlKHdlaWdodF9rZyA9IHdlaWdodCAqIDAuMDAxKQojIyBFcnJvcjogPHRleHQ+OjI6MTg6IHVuZXhwZWN0ZWQgJzwnCiMjIDE6IGNoaWNrd3RzICU+JSAKIyMgMjogICBmaWx0ZXIod2VpZ2h0ID08CiMjICAgIApgYGAKCgojIEVycm9yIDkgLS0tLQpDcmVhdGUgYSB0aWJibGUgd2l0aCBjb2x1bW4gYWxwaGFiZXQgd2hpY2ggY29udGFpbnMgdGhlIEVuZ2xpc2ggYWxwaGFiZXQgYW5kIGNvbHVtbiBudW1iZXJzIHdoaWNoIGhhcyBhIHVuaXF1ZSBudW1iZXIgZm9yIGVhY2ggbGV0dGVyLiBUaGVuIHJlbW92ZSByb3dzIHdoZXJlIHRoZSBsZXR0ZXIgaXMgQSwgQiBvciBDLgoKYGBge3J9CnRpYmJsZShhbHBoYWJldCA9IExFVFRFUlMsCiAgICAgICBudW1iZXJzID0gMToyNikgJT4lIAogIGZpbHRlcihhbHBoYWJldCAhPSBjKCJBIiwgIkIiLCAiQyIpKQojIyBFcnJvciBpbiB0aWJibGUoYWxwaGFiZXQgPSBMRVRURVJTKCksIG51bWJlcnMgPSAxOjI1KSAlPiUgZmlsdGVyKGxldHRlciAhPSA6IGNvdWxkIG5vdCBmaW5kIGZ1bmN0aW9uICIlPiUiCmBgYAoKCgojIEVycm9yIDEwIC0tLS0KClRoZSBjaHVuayBiZWxvdyBjcmVhdGVzIHRoZSBkYXRhIGZvciB0aGlzIGVycm9yIChkb27igJl0IGNoYW5nZSBhbnl0aGluZyBpbiBpdCk6CkRvbid0IGNoYW5nZSBhbnl0aGluZyBpbiB0aGlzIGNvZGUgY2h1bmsKYnV0IHlvdSB3aWxsIG5lZWQgdG8gaW5jbHVkZSBpdCBpbiB5b3VyIG5vdGVib29rcwoKc2V0LnNlZWQoOTk5KQoKYGBge3J9CnNjZW50X3JhdGluZ3MgPC0gdGliYmxlKAogIGlEID0gcmVwKDE6MTAsIGVhY2ggPSA1KSwKICBTQ0VOVCA9IHJlcChjKCJOZXcgYm9vayIsICJDdXQgZ3Jhc3MiLCAiUm9zZSBvaWwiLCAiRnJlc2ggbGluZW4iLCAiV2V0IGRvZyIpLCAxMCksCiAgcmF0aW5nID0gc2FtcGxlKGMoMDo1LCBOQSksIDUwLCByZXBsYWNlID0gVFJVRSksCiAgUGVyc29uQWdlID0gcmVwKE5BLCA1MCkKKQpgYGAKCmBgYHtyfQojIyBFcnJvciBpbiB0aWJibGUoaUQgPSByZXAoMToxMCwgZWFjaCA9IDUpLCBTQ0VOVCA9IHJlcChjKCJOZXcgYm9vayIsICJDdXQgZ3Jhc3MiLCA6IGNvdWxkIG5vdCBmaW5kIGZ1bmN0aW9uICJ0aWJibGUiCgojI0NsZWFuIHRoZSB2YXJpYWJsZSBuYW1lcyBhbmQgZHJvcCBtaXNzaW5nIHJhdGluZ3MgZnJvbSBzY2VudF9yYXRpbmdzIGFuZCBjYWxjdWxhdGUgYW4gYXZlcmFnZSByYXRpbmcgcGVyIHNjZW50LgoKc2NlbnRfcmF0aW5nc19uZXcgPC0gc2NlbnRfcmF0aW5ncyAlPiUgCiAgamFuaXRvcjo6Y2xlYW5fbmFtZXMoKQoKIyMgRXJyb3IgaW4gc2NlbnRfcmF0aW5ncyAlPiUgamFuaXRvcjpjbGVhbl9uYW1lcygpOiBjb3VsZCBub3QgZmluZCBmdW5jdGlvbiAiJT4lIgpzY2VudF9yYXRpbmdzX25ldyAlPiUgCiAgc2VsZWN0KGlfZCwgc2NlbnQsIHJhdGluZykgJT4lIAogIGRyb3BfbmEoKSAlPiUgCiAgZ3JvdXBfYnkoc2NlbnQpICU+JSAKICBzdW1tYXJpc2UobWVhbl9yYXRpbmcgPSBtZWFuKHJhdGluZykpCiMjIEVycm9yIGluIHNjZW50X3JhdGluZ3MgJT4lIGRyb3BfbmEoKSAlPiUgZ3JvdXBfYnkoc2NlbnQpICU+JSBzdW1tYXJpc2UobWVhbl9yYXRpbmcgPSBtZWFuKCkpOiBjb3VsZCBub3QgZmluZCBmdW5jdGlvbiAiJT4lIgpgYGA=</div>
 
 
 
