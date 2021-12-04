@@ -1,0 +1,33 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Import Files and Libraries
+```{r}
+library(tidyverse)
+```
+
+```{r}
+books <- read_csv("books.csv")
+```
+
+# Look at the data
+Data is 11,123 rows and 13 columns
+
+```{r}
+glimpse(books)
+```
+
+```{r}
+names(books)
+```
+
+
+Check for missing values
+Phew there aren't any
+```{r}
+books %>% 
+  summarise(across(.cols = everything(), .fns = ~ sum(is.na(.x))))
+```
+
