@@ -3,16 +3,17 @@ title: "R Notebook"
 output: html_notebook
 ---
 
-# Import Files and Libraries
+# Import Files and Libraries ----
 ```{r}
 library(tidyverse)
+library(lubridate)
 ```
 
 ```{r}
 books <- read_csv("books.csv")
 ```
 
-# Look at the data
+# Look at the data ----
 Data is 11,123 rows and 13 columns
 
 ```{r}
@@ -22,7 +23,7 @@ glimpse(books)
 ```{r}
 names(books)
 ```
-
+Fields are: id, title, author, average rating, isbn, isbn13, language code, number of pages, ratings count, text reviews count, publication date, publisher
 
 Check for missing values
 Phew there aren't any
@@ -30,4 +31,228 @@ Phew there aren't any
 books %>% 
   summarise(across(.cols = everything(), .fns = ~ sum(is.na(.x))))
 ```
+
+# Think about possible ways to cut up the data ----
+
+The fields are perhaps the best way to help here and basing it on work we 
+have already done. There needs to be at least five bits of analysis done - so
+I am going to think of them as 5 questions to consider.
+
+# Question 1 ----
+
+What are the top and bottom 10 books in the list?
+
+```{r}
+books %>% 
+  slice_max(average_rating,n =10) %>% 
+select(title, average_rating, ratings_count)
+```
+This intial bit of  code worked well - but it produced unexpected results
+Instead of 10, I got 22 books. I looked at the data and found it was because
+a number of books had received the maximum of 5/5 score. On further analysis
+this could be seen to be because there weren't many ratings of these books
+and the rating value could possibly not be statistically valid.
+
+My next thought was to look at what the spread of ratings_count was so I ran
+the summary function on the data
+
+```{r}
+summary(books)
+```
+
+Looking at the ratings_count this gave some interesting data:
+The minimum was 0 and the maximum was 4.6 million! A huge range
+The first quartile was 104
+The median 745
+Mean 17943
+
+So thinking again about my original question I thought about how I could 
+gain a more meaningful answer. I need to exclude those books with only 
+a few reviews to reduce the chances of the data skewing. If I only look
+at books with over 100 reviews then I am cutting out the 1st quartile and
+should hopefully get a better picture of the data. Let's give it a go:
+
+```{r}
+Top_10_books <- books %>% 
+  filter(ratings_count >= 100) %>% 
+  slice_max(average_rating,n =10) %>% 
+  select(title, average_rating, ratings_count) 
+Top_10_books
+```
+This gives a much more meaningful result and we can see Calvin and Hobbes 
+and some of the Harry Potter books are in the top 10.
+
+Now to repeat the process for the lowest rated 10 books - again removing
+those with less than 100 reviews.
+
+```{r}
+Bottom_10_books <- books %>% 
+  filter(ratings_count >= 100) %>% 
+  slice_min(average_rating,n =10) %>% 
+  select(title, authors, average_rating, ratings_count) 
+Bottom_10_books
+```
+So - we know which books to avoid now!
+
+# Question 2 ----
+
+Which authors have the most books?
+And which authors books have the highest/lowest ratings?
+
+```{r}
+author_grouping <- books %>% 
+  filter(ratings_count >= 100) %>% 
+  select(authors, average_rating) %>% 
+  group_by(authors) %>% 
+  mutate(mean(average_rating)) %>% 
+  summarise(mean = mean(average_rating)) 
+author_grouping %>% arrange(desc(mean))
+```
+
+Some observations from this question:
+Again I had the problem of perfect 5s coming in from books with small numbers
+of reviews - so I  added  in the code  used previously to filter out books with 
+less than 100 reviews.
+ 
+Anonymous at number 4 is doing rather well!
+
+# Question 3 ----
+
+How many books are in the list for each language and what does
+this tell us about the dataset?
+
+
+```{r}
+languages <- books %>% 
+  count(language_code) 
+languages %>% arrange(desc(n))
+```
+
+Rather unsurprisingly three of the top 5 languages are English, English (USA) 
+and English (UK) accounting for almost 95% of the books on the database.
+
+
+# Question 4 ----
+
+In what year were all of the books written?
+
+The first thing I need to do is make the publication_date recognisable as 
+a date - googling suggests the package that I will find useful is lubridat
+so I have added it to the import section at the top of the code.
+
+```{r}
+year_pub <- books %>% 
+  mutate(pub_year = format(as.Date(publication_date, 
+                                           format = "%m/%d/%Y"), "%Y")) %>% 
+  select(pub_year, average_rating, ratings_count) %>% 
+  group_by(pub_year)
+
+year_pub
+```
+
+
+# Question 5 ----
+
+Which books have the highest number of ratings?
+And what is their average rating?
+
+```{r}
+Lots_ratings <- books %>% 
+  slice_max(text_reviews_count, n = 10) %>% 
+  select(title, ratings_count, average_rating) 
+Lots_ratings
+```
+
+The book with the most ratiing (4.6 million) was Twilight - with an average 
+rating of 3.59
+
+Also in the top 10 were 
+  The Book Thief
+  The Giver
+  The Alchemist
+  Water for Elephants
+
+
+# Question 6 ----
+
+Does the length of a book determine its success?
+
+For this question I need to find the longest and shortest books and their
+average rating - perhaps as the course goes on we can learn how to correlate
+these values and see if there is a pattern.
+
+
+```{r}
+long_books <- books %>% 
+  slice_max(num_pages, n = 10) %>% 
+  select(title, num_pages, average_rating) 
+long_books
+```
+# Top  10 Books by Length: ----
+
+The Complete Aubrey/Maturin Novels (5 Volumes)	
+The Second World War	
+Remembrance of Things Past (Boxed Set)	
+Harry Potter Collection (Harry Potter #1-6)	
+Summa Theologica 5 Vols	
+Harrison's Principles of Internal Medicine	
+Harry Potter Boxed Set Books 1-5 (Harry Potter #1-5)	
+The Sword of Truth Boxed Set I: Wizard's First Rule Blood of the Fold Stone of Tears (Sword of Truth #1-3)	
+The J.R.R. Tolkien Companion and Guide	
+Study Bible: NIV
+
+
+```{r}
+short_books <- books %>% 
+  filter(num_pages > 200) %>% 
+  slice_min(num_pages, n = 10) %>% 
+  select(title, num_pages, average_rating) 
+short_books
+```
+
+For the short books there seems to be some incorrect data - with some books 
+being recorded as having no or very few pages. I went back to the summary
+of the data and used the 1st quartile as a cut off - this was 194 - so I
+just used 200 as a filter. I am sure we will find more statistical valid
+methods for cutting the data in the future.
+
+# Shortest 19 Books ----
+Body For Life: 12 Weeks to Mental and Physical Strength	
+Don't Make Me Think: A Common Sense Approach to Web Usability	
+Franny and Zooey	
+Death Note Vol. 8: Target (Death Note #8)	
+Death Note Vol. 5: Whiteout (Death Note #5)	
+Absolutely Normal Chaos	
+The Last Quarry (Quarry #7)	
+Silence	
+Wooden: A Lifetime of Observations and Reflections On and Off the Court	
+Trials of Death (Cirque Du Freak #5)	
+Mary Queen of Scots: Queen Without a Country	
+Jojo's Bizarre Adventure Tome 17: L'Amoureux terrible (Stardust Crusaders #5)	
+Jojo's Bizarre Adventure Tome 14: Le revolver est plus fort que l'épée (Stardust Crusaders #3)	
+Mr Tompkins in Paperback (Canto)	
+Bulgakov's the Master and Margarita: The Text as a Cipher	
+The Poetry of Sylvia Plath	
+Dante: Poet of the Secular World	
+Warren G. Harding (The American Presidents #29)	
+Just as Long as We're Together
+
+
+# More analysis/cleaning
+
+In summary I just chose a couple of things to look at but there are so many 
+more I could have done. Also I noticed some things in the data that could be
+done to clean it.
+
+More analysis ideas:
+  * Look at the rating by a particular author
+    Eg - which of Agatha Christie's novels has the highest rating
+  * Look in more detail at the year information - is there a particular
+  decade or century that has higher rated books?
+  
+Cleaning suggestions:
+  * Clean up some of the terms used
+      eg - Arrow Books and Arrow Books Ltd are presumably the same company
+  * Remove the audio books which typically have low page numbers
+  * Remove compilations and boxed sets
 
