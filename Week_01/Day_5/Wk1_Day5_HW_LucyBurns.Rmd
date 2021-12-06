@@ -38,7 +38,7 @@ The fields are perhaps the best way to help here and basing it on work we
 have already done. There needs to be at least five bits of analysis done - so
 I am going to think of them as 5 questions to consider.
 
-# Question 1 ----
+# Question 1 What are the top and bottom 10 books in the list? ----
 
 What are the top and bottom 10 books in the list?
 
@@ -94,7 +94,7 @@ Bottom_10_books
 ```
 So - we know which books to avoid now!
 
-# Question 2 ----
+# Question 2 Which authors have the most books? ----
 
 Which authors have the most books?
 And which authors books have the highest/lowest ratings?
@@ -104,10 +104,13 @@ author_grouping <- books %>%
   filter(ratings_count >= 100) %>% 
   select(authors, average_rating) %>% 
   group_by(authors) %>% 
-  mutate(mean(average_rating)) %>% 
-  summarise(mean = mean(average_rating)) 
-author_grouping %>% arrange(desc(mean))
+  # mutate(mean(average_rating)) %>% 
+  summarise(n_books = n(),
+    mean = mean(average_rating)) 
+author_grouping %>% arrange(desc(n_books))
 ```
+EDITED CODE - to add in the number of books by author
+
 
 Some observations from this question:
 Again I had the problem of perfect 5s coming in from books with small numbers
@@ -116,7 +119,7 @@ less than 100 reviews.
  
 Anonymous at number 4 is doing rather well!
 
-# Question 3 ----
+# Question 3 How many books are in the list for each language? ----
 
 How many books are in the list for each language and what does
 this tell us about the dataset?
@@ -132,7 +135,7 @@ Rather unsurprisingly three of the top 5 languages are English, English (USA)
 and English (UK) accounting for almost 95% of the books on the database.
 
 
-# Question 4 ----
+# Question 4 In what year were all of the books written? ----
 
 In what year were all of the books written?
 
@@ -151,7 +154,7 @@ year_pub
 ```
 
 
-# Question 5 ----
+# Question 5 Which books have the highest number of ratings? ----
 
 Which books have the highest number of ratings?
 And what is their average rating?
@@ -163,7 +166,7 @@ Lots_ratings <- books %>%
 Lots_ratings
 ```
 
-The book with the most ratiing (4.6 million) was Twilight - with an average 
+The book with the most rating (4.6 million) was Twilight - with an average 
 rating of 3.59
 
 Also in the top 10 were 
@@ -173,7 +176,7 @@ Also in the top 10 were
   Water for Elephants
 
 
-# Question 6 ----
+# Question 6 Does the length of a book determine its success? ----
 
 Does the length of a book determine its success?
 
@@ -255,4 +258,61 @@ Cleaning suggestions:
       eg - Arrow Books and Arrow Books Ltd are presumably the same company
   * Remove the audio books which typically have low page numbers
   * Remove compilations and boxed sets
+
+# Additional work from homework review----
+
+# Neringa's Code: ----
+
+```{r}
+books %>% 
+  group_by(publisher) %>% 
+  summarise(mean_rating = mean(average_rating), total_ratings = sum(ratings_count)) %>% 
+  slice_max(total_ratings, n = 10)
+```
+
+
+
+# Tom's code ----
+```{r}
+best_authors <- books %>%
+  group_by(authors) %>%
+  summarise(avg_rating = mean(average_rating))
+slice_max(best_authors, avg_rating, n = 5, with_ties = FALSE)
+# after using this, I have noticed that this is an unfair comparison as some                                                          books have been rated very little and received higher ratings
+```
+
+```{r}
+avg_rating_count <- books %>%
+  summarise(avg_rating_count = mean(ratings_count)) %>%
+  pull()
+avg_rating_count
+# aiming to get the average number of ratings per book, to use that figure as                                                             a limit to the number of books I will make comparisons with
+```
+
+```{r}
+books %>%
+  filter(ratings_count >= avg_rating_count) %>%
+  group_by(authors) %>%
+  summarise(avg_rating = mean(average_rating)) %>%
+  slice_max(avg_rating, n = 5)
+# had to group the authors, then get an average of their ratings, then slice
+# Bill Watterson according to this data set it the highest rated author
+```
+
+```{r}
+books %>%
+  filter(authors == "Bill Watterson")
+# finding out what books the top rated author wrote - Calvin And Hobbes seems                                                           to be the predominant book, which is a popular American strip
+```
+
+# Howard's Code ----
+```{r}
+books %>% group_by(publisher) %>%               
+        slice_max(ratings_count, n = 1, with_ties = FALSE) %>%
+        select (publisher,ratings_count) %>%
+        ungroup() %>% 
+        slice_max(ratings_count, n =10) %>% 
+        arrange(desc(ratings_count))  %>%
+        head(10)    
+```
 
