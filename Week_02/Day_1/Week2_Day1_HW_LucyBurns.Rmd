@@ -100,6 +100,8 @@ hat_observations_4 <- hat_observations_3 %>%
   arrange(desc(observation_count)) 
 hat_observations_4
 ```
+
+
 The day when the most berets were seen was 18/6/2018
 
 
@@ -138,6 +140,13 @@ frauds4
 # This has not reordered them the way I want 
 ```
 
+```{r}
+# Corrected Code:
+card_base %>% 
+  inner_join(customer_base, by = "Cust_ID") %>% 
+  inner_join(transaction_base, by = c("Card_Number" = "Credit_Card_ID")) %>% 
+  inner_join(fraud_base, by = "Transaction_ID")
+```
 
 
 ## `tidyr`
@@ -145,3 +154,14 @@ frauds4
 # **Question 2** ----
 
 Read in `exam_scores` and transform it into long format with two new columns `exam_question` and `score`. Then, using `separate` and `select`, remove superfluous information from the values in `exam_question`
+
+```{r}
+
+exam_scores_long <- exam_scores %>% 
+  pivot_longer(exam_Q1:exam_Q10, names_to = "exam_question", values_to = "score") 
+
+exam_scores_long %>% 
+  separate(exam_question, sep = "Q", into = c("extra_column", "exam_question")) %>% 
+  select(-extra_column)
+```
+

@@ -1,0 +1,168 @@
+---
+title: "Tidyverse consolidation homework"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Learning Objectives 
+
+Be able to explore and wrangle an unseen dataset so as to answer specific questions
+
+# Introduction
+
+Social media is everywhere, and the ability to analyse data from it is invaluable. If you want to scrape data from Twitter yourself, you can use the `rtweet` package. All that is needed is a Twitter account, and you are good to go. 
+<center>
+![](http://www.storybench.org/wp-content/uploads/2018/11/rtweet-730x461.png)
+</center>
+
+In this case, we have used the `rtweet` package to download 500 tweets from the [@CodeClanScot twitter page](https://twitter.com/CodeClanScot). 
+  
+In this homework, you will be working with data downloaded from the CodeClan Twitter page, to do some analysis of overall tweet metrics (likes and retweets), as well as some analysis of the tweet and hashtag content. You'll also be working with the strings contained within variables. 
+
+The overall goal of the homework is to practice everything you've learnt this week on an entirely new dataset. 
+
+
+# MVP 
+
+# **Question 1.**  ----
+Load the `code_clan_tweets.csv` data. Find the number of rows, columns, and list all the variable names. 
+
+
+```{r}
+library(tidyverse)
+library(dbplyr)
+tweets <- read_csv("data/code_clan_tweets.csv")
+info <- read_csv("data/code_clan_info.csv")
+```
+
+```{r}
+glimpse (tweets)
+```
+
+There are 234 rows with 27 columns of data
+
+```{r}
+ls(tweets)
+```
+The variable names are:
+[1] "created_at"             "display_text_width"     "favorite_count"         "hashtags"               "is_quote"              
+ [6] "is_retweet"             "media_type"             "quote_count"            "reply_count"            "reply_to_screen_name"  
+[11] "reply_to_status_id"     "reply_to_user_id"       "retweet_count"          "retweet_favorite_count" "retweet_location"      
+[16] "retweet_retweet_count"  "retweet_source"         "retweet_user_id"        "screen_name"            "source"                
+[21] "symbols"                "text"                   "tweet_id"               "urls_expanded_url"      "urls_t.co"             
+[26] "urls_url"               "user_id"       
+
+# **Question 2.**  ----
+Find the total number of favourites (stored in `favorite_count`) that CodeClan tweets have got. Don't add a tweet's `favorite_count` to the total when the tweet was quoted (see the `is_quote` variable). 
+
+
+```{r}
+tweets %>% 
+  group_by(is_quote, is_quote) %>% 
+  summarise (favorite_count = sum(favorite_count))
+```
+
+Total number of tweets in 'favorite_count' that are not quoted is 425
+
+# **Question 3.**  ----
+Summarise the mean number of retweets (`retweet_count`), split by the type of platform that was used to tweet (`source`). Again, omit quoted tweets from the mean.
+
+```{r}
+no_quote <- tweets %>% 
+  filter(is_quote == FALSE) 
+```
+
+```{r}
+no_quote %>% 
+  group_by(source) %>% 
+  summarise (retweet_count = mean(retweet_count))
+```
+Mean retweet by platform (excluding quoted tweets)
+Hootsuite Inc.	      1.428571			
+Tweetbot for Mac	    4.000000			
+TweetDeck	            5.000000			
+Twitter for iPhone	  3.051948			
+Twitter Web App	      2.478632			
+Twitter Web Client	  2.000000	
+
+
+# **Question 4.**  ----
+Count the total number of likes (i.e. total of `favorite_count`), split by `media` type, and arrange them from most likes to least. Assume that any tweets without a listed `media` type are of type "text".  
+
+```{r}
+tweets %>% 
+  group_by(media_type) %>% 
+  summarise(favorite_count = sum(favorite_count))
+```
+ There are only two types of media listed photo and NA (which we assume is text)
+
+# **Question 5.**  ----
+Find the mean number of characters that a CodeClan tweet contains.  You can either find a way to count the text in the `text` variable, or use the variable `display_text_width` which contains a count. Checking both would be a good idea if possible to see if they match (but it's not essential).  
+
+```{r}
+  mean(tweets$display_text_width)
+```
+The mean of the tweet length is 149.4188
+
+I did try to do this finding the length of the 'text' variable - but the length appeared to be the same for them all so there was definitely an error in my code
+
+# **Question 6.**----
+The `code_clan_info.csv` data file contains `status_url` along with other info. Load this in, and join it to the `code_clan_tweets` tibble, so that you have a `status_url` for each tweet. Decide which variable to join the tibbles on.  
+
+```{r}
+joined_tables <- left_join(tweets, info, by = "tweet_id")
+```
+ 
+
+# **Question 7.**  ----
+From your new joined data, create a new tibble `codeclan_hashtags` containing only the `tweet_id` and convert the hashtags into lowercase for analysis. Keep only those tweets with hashtags.
+
+```{r}
+codeclan_hashtags <- joined_tables %>% 
+  select(tweet_id, hashtags) %>% 
+  mutate(lower_hashtags = str_to_lower(hashtags) ) %>% 
+  drop_na(hashtags) 
+codeclan_hashtags
+```
+
+There are 117 tweets that contain hashtags
+
+## Extensions ----
+
+
+
+# **Question 8.**  ----
+Some tweets have more than one hashtag, denoted by the `c(` symbols at the start of the string. Use the `str_sub()` and `str_detect()` functions and your `codeclan_hashtags` tibble from above to find all the cases in which the hashtag string begins with characters`c(`.
+<details>
+<summary>**Hint**</summary>
+Try a regex pattern `"c\\("`. The double backslash is necessary in R to mark a backslash as itself being escaped. 
+</details>
+
+
+
+# **Question 9.**  ----
+Use the `str_detect()` function to find all tweets with `text` that mentions "Edinburgh", and count how many such tweets there are. 
+<details>
+<summary>**Hint**</summary>
+You may need to make sure your tweets are all the same case before searching.
+</details>
+
+<br>
+
+# **Question 10.**  ----
+Use `str_extract_all()` with a regular expression to find out which Twitter users CodeClan have been tweeting. 
+<details>
+<summary>**Hint**</summary>
+Think about all the different characters which could be in a Twitter username, do a bit of online research
+</details>
+
