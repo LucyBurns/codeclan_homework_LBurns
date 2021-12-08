@@ -49,6 +49,14 @@ info <- read_csv("data/code_clan_info.csv")
 glimpse (tweets)
 ```
 
+```{r}
+#Using Homework Answers - Other options
+view(tweets)
+dim(tweets)
+names(tweets)
+```
+
+
 There are 234 rows with 27 columns of data
 
 ```{r}
@@ -68,9 +76,18 @@ Find the total number of favourites (stored in `favorite_count`) that CodeClan t
 
 ```{r}
 tweets %>% 
-  group_by(is_quote, is_quote) %>% 
+  group_by(is_quote) %>% 
   summarise (favorite_count = sum(favorite_count))
 ```
+
+```{r}
+# From homework answers
+# 2 : count total number of favourites
+tweets %>%
+  filter(is_quote == FALSE) %>%
+  summarise(total = sum(favorite_count))
+```
+
 
 Total number of tweets in 'favorite_count' that are not quoted is 425
 
@@ -95,6 +112,18 @@ Twitter for iPhone	  3.051948
 Twitter Web App	      2.478632			
 Twitter Web Client	  2.000000	
 
+```{r}
+#Code from homework answers
+# 3 : summarise mean number of retweets by source platform
+mean_retweets <- tweets %>%
+  filter(is_quote == FALSE) %>%
+  group_by(source) %>%
+  summarise(average_retweet = mean(retweet_count))
+
+head(mean_retweets)
+```
+
+
 
 # **Question 4.**  ----
 Count the total number of likes (i.e. total of `favorite_count`), split by `media` type, and arrange them from most likes to least. Assume that any tweets without a listed `media` type are of type "text".  
@@ -106,6 +135,17 @@ tweets %>%
 ```
  There are only two types of media listed photo and NA (which we assume is text)
 
+```{r}
+#Homework Answers
+# 4 : count the number of likes by media type, and arrange them from most likes to least 
+tweets %>%
+  mutate(media_type = coalesce(media_type, "text")) %>%
+  group_by(media_type) %>%
+  summarise(favourite_count_total = sum(favorite_count)) %>%
+  arrange(desc(favourite_count_total))
+```
+
+
 # **Question 5.**  ----
 Find the mean number of characters that a CodeClan tweet contains.  You can either find a way to count the text in the `text` variable, or use the variable `display_text_width` which contains a count. Checking both would be a good idea if possible to see if they match (but it's not essential).  
 
@@ -115,6 +155,25 @@ Find the mean number of characters that a CodeClan tweet contains.  You can eith
 The mean of the tweet length is 149.4188
 
 I did try to do this finding the length of the 'text' variable - but the length appeared to be the same for them all so there was definitely an error in my code
+
+```{r}
+# Homework Answers
+# 5 : find the mean number of characters a tweet contains
+tweets %>%
+  summarise(avg_tweet_length = mean(display_text_width))
+```
+
+```{r}
+#Homework Answers
+# alternative way of testing the str_length function
+code_clan_tweets_text <- tweets %>%
+  mutate(count_str_length = str_length(text)) %>%
+  select(count_str_length, display_text_width) %>% 
+  summarise(mean_str_length = mean(count_str_length),
+            mean_disp_width = mean(display_text_width))
+code_clan_tweets_text
+```
+
 
 # **Question 6.**----
 The `code_clan_info.csv` data file contains `status_url` along with other info. Load this in, and join it to the `code_clan_tweets` tibble, so that you have a `status_url` for each tweet. Decide which variable to join the tibbles on.  
@@ -130,8 +189,9 @@ From your new joined data, create a new tibble `codeclan_hashtags` containing on
 ```{r}
 codeclan_hashtags <- joined_tables %>% 
   select(tweet_id, hashtags) %>% 
-  mutate(lower_hashtags = str_to_lower(hashtags) ) %>% 
-  drop_na(hashtags) 
+  mutate(lower_hashtags = str_to_lower(hashtags) ) %>%   
+  select(-hashtags) %>%
+  drop_na(lower_hashtags) 
 codeclan_hashtags
 ```
 
@@ -143,21 +203,38 @@ There are 117 tweets that contain hashtags
 
 # **Question 8.**  ----
 Some tweets have more than one hashtag, denoted by the `c(` symbols at the start of the string. Use the `str_sub()` and `str_detect()` functions and your `codeclan_hashtags` tibble from above to find all the cases in which the hashtag string begins with characters`c(`.
-<details>
-<summary>**Hint**</summary>
-Try a regex pattern `"c\\("`. The double backslash is necessary in R to mark a backslash as itself being escaped. 
-</details>
 
+**Hint**
+Try a regex pattern `"c\\("`. The double backslash is necessary in R to mark a backslash as itself being escaped. 
+
+
+```{r}
+# Homework Answers
+# 8 : use the str_sub function to get the first 2 letters of each tweet
+hashtags_multiple <- codeclan_hashtags %>% 
+  mutate(first_letters = str_sub(lower_hashtags, 1, 2)) %>%
+  filter(str_detect(first_letters, "c\\("))
+
+hashtags_multiple
+```
 
 
 # **Question 9.**  ----
 Use the `str_detect()` function to find all tweets with `text` that mentions "Edinburgh", and count how many such tweets there are. 
-<details>
-<summary>**Hint**</summary>
-You may need to make sure your tweets are all the same case before searching.
-</details>
 
-<br>
+**Hint**
+You may need to make sure your tweets are all the same case before searching.
+
+```{r}
+# Homework Answer
+# 9: Use the str_detect() function to find all cases where a tweet text mentions edinburgh, and count in how many tweets it appears
+tweets %>%
+  mutate(lowcase_tweets = str_to_lower(text)) %>%
+  filter(str_detect(lowcase_tweets, "edinburgh")) %>%
+  summarise(count = n())
+```
+
+
 
 # **Question 10.**  ----
 Use `str_extract_all()` with a regular expression to find out which Twitter users CodeClan have been tweeting. 
@@ -165,4 +242,13 @@ Use `str_extract_all()` with a regular expression to find out which Twitter user
 <summary>**Hint**</summary>
 Think about all the different characters which could be in a Twitter username, do a bit of online research
 </details>
+
+```{r}
+# Homework Answer
+# 10: use str_extract_all and regex to find usernames
+user_pattern <- "@[a-zA-Z0-9_]+"
+tweets2 <- tweets %>% 
+  select(text)
+head(str_extract_all(tweets$text, user_pattern))
+```
 
