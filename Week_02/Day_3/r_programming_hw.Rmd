@@ -64,6 +64,7 @@ forecast_14day <- cbind(c(5, 4, 5, 7, 6, 7, 8),c(9, 8, 6, 6, 5, 5, 5))
 colnames(forecast_14day) <- c("Week1", "Week2")
 rownames(forecast_14day) <- c("Day1", "Day2", "Day3", "Day4", 
                               "Day5", "Day6", "Day7")
+forecast_14day
 ```
 
 # **Question 4.** ----
@@ -118,16 +119,11 @@ Write a function which checks if two vectors have the same elements.
 * If they have the same elements but in a different order, return "The same"
 * If they don't have the same elements, return "Different".
 
-
-
 # **Hints** ----
 * You can check if two vectors have the same elements but in a different order by using `sort` to sort each vector first and then checking if they are equal.
 * Have a look at the `all()` function
 
-
-
 ## Extension ----
-
 
 
 # **Question 7.** ----
@@ -135,6 +131,24 @@ Write code that prints a multiplication table for numbers up to 12. i.e. there w
 
 *From: https://adriann.github.io/programming_problems.html*
 
+
+```{r}
+m <- matrix(nrow = 12, ncol = 12)
+
+num_rows <- dim(m)[1]
+num_cols <- dim(m)[2]
+
+for (row_index in 1:num_rows) {
+  for (col_index in 1:num_cols) {
+    m[row_index,col_index]=row_index*col_index
+  }
+  
+}
+colnames(m) <- c(1:12)
+rownames(m) <- c(1:12)
+m
+
+```
 
 
 # **Question 8.**  -----
