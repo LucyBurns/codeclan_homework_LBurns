@@ -112,6 +112,60 @@ if (class(x) == "numeric" & (x) < 10){
 }
 ```
 
+```{r}
+# Answers from homework
+answer_or_divide <- function(x) {
+  if (is.character(x)) {
+    return(paste("The answer is: ", x))
+  }
+
+  if (is.numeric(x)) {
+    if (x < 10) {
+      return(x)
+    } else {
+      return(x / 10)
+    }
+  }
+
+  return("Invalid input")
+}
+```
+
+Testing:
+
+```{r}
+answer_or_divide("forty-two")
+answer_or_divide("42")
+answer_or_divide(9)
+answer_or_divide(19)
+```
+
+```{r}
+# Notes from homework review
+# check if the number is greater or less than 10
+# check if the input is a character
+# check if the input is a numeric
+# using a return() - which is a key word function - it stops the execution of the 
+# function and returns the answer
+
+answer_or_divide <- function(x) {
+  if (is.character(x)) {
+    return(paste("The answer is: ", x))
+  }
+
+  if (is.numeric(x)) {
+    if (x < 10) {
+      return(x)
+    } else {
+      return(x / 10)
+    }
+  }
+
+  return("Invalid input")
+}
+```
+
+
 # **Question 6.** ----
 Write a function which checks if two vectors have the same elements. 
 
@@ -122,6 +176,35 @@ Write a function which checks if two vectors have the same elements.
 # **Hints** ----
 * You can check if two vectors have the same elements but in a different order by using `sort` to sort each vector first and then checking if they are equal.
 * Have a look at the `all()` function
+
+```{r}
+is_same_vector <- function(vector_1, vector_2) {
+  if (all(vector_1 == vector_2)) {
+    return("Exactly the same")
+  }
+
+  if (all(sort(vector_1) == sort(vector_2))) {
+    return("The same")
+  }
+
+  return("Different")
+}
+```
+
+```{r}
+a <- c(1, 2, 3, 4, 5)
+b <- c(1, 4, 2, 3, 5)
+c <- c(9, 4, 8, 1, 0)
+d <- c(1, 2, 3, 4, 5)
+```
+
+```{r}
+is_same_vector(a, a)
+is_same_vector(a, b)
+is_same_vector(a, c)
+is_same_vector(a, d)
+```
+
 
 ## Extension ----
 
@@ -162,5 +245,38 @@ You may want to use the function `cat()`. This is similar to `print()`, but prin
 3 | *******
 4 | ****
 5 | **
+```
+
+```{r}
+make_histogram <- function(x){
+  
+  distinct <- sort(unique(x))
+  
+  for (i in distinct){
+    
+    count <- sum(x == i)
+    
+    cat(i)
+    cat(" | ")
+    cat(rep("*", count))
+    cat("\n")
+    
+  }
+  
+}
+```
+
+```{r}
+numbers <- sample(1:5, size = 50, replace = TRUE) 
+numbers
+```
+
+```{r}
+make_histogram(numbers)
+```
+
+```{r}
+cat(paste(letters, 100* 1:26), fill = TRUE, labels = paste0("{", 1:10, "}:"))
+
 ```
 
