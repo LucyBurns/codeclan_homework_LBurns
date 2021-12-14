@@ -195,17 +195,24 @@ select
     
  select 
     concat(first_name, ' ', last_name, ' - ', department, ' (joined ',
-        (extract(year from start_date)), ')')
+        extract(year from start_date), ')') as badge_label
     from employees e 
-where (first_name, last_name , department, start_date) is not null  
+where (first_name, last_name , department, start_date) is not null  ;
 
     
  -- Attempting to add in the month - but can't get the code working just now 
     
-select 
-    extract(month from start_date) as start_month
-    format(start_month, 'MMMM') 'Month_name'
-from employees e 
+SELECT
+  concat(
+    first_name, ' ', last_name, ' - ', department, ' (joined ', 
+    to_char(start_date, 'FMMonth'), ' ', to_char(start_date, 'YYYY'), ')'
+  ) AS badge_label
+from employees
+where 
+  first_name is not null and 
+  last_name is not null and 
+  department is not null and
+  start_date is not null;
 
 
 
