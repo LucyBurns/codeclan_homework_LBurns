@@ -259,99 +259,59 @@ order by count(id) desc, first_name
 
 --NOT COMPLETD _ JUST VARIOUS BITS OF CODE I WAS PLAYING WITH
 
-with grade1_count as (
-    select 
-        department,
-        count(*)as count
-    from employees as e
-    group by grade 
-    having grade = 1
-),
-total_count as (
-    select 
-        department,
-        count(*)
-    from employees 
-    group by department 
-)
-select *
-from employees as e
-where 
 
-select  
-    grade,
-    count(grade = 1) as grade1_count,
-    count(*)* / sum(count(*)) over () as proportion
-from employees as e
-group by department, grade 
-    
 
+
+-- Answer from class notes
 SELECT 
-    department,
-    count(*)
+  department, 
+  SUM(CAST(grade = '1' AS INT)) / CAST(COUNT(id) AS REAL) AS prop_grade_1 
 FROM employees 
-GROUP BY department, grade 
-HAVING grade = 1
+GROUP BY department;
 
-SELECT 
-    department,
-    count(*)
+-- Alternative answer
+
+SELECT
+  department, 
+  SUM((grade = '1')::INT) / COUNT(id)::REAL AS prop_grade_1 
 FROM employees 
-GROUP BY department 
+GROUP BY department;
 
 
-select 
-    department ,
-    as proportion_grade1
-from employees
-group by first_name 
-having first_name is not null and count(id)>1
-order by count(id) desc, first_name 
+--2 Extension
+--Some of these problems may need you to do some online research on SQL statements 
+--we haven’t seen in the lessons up until now… Don’t worry, we’ll give you pointers, 
+--and it’s good practice looking up help and answers online, data analysts and 
+--programmers do this all the time! If you get stuck, it might also help to sketch 
+--out a rough version of the table you want on paper (the column headings and first 
+--few rows are usually enough).
+
+--Note that some of these questions may be best answered using CTEs or window 
+--functions: have a look at the optional lesson included in today’s notes!
+
+--Question 1. [Tough]
+--Get a list of the id, first_name, last_name, department, salary and fte_hours of 
+--employees in the largest department. Add two extra columns showing the ratio of 
+--each employee’s salary to that department’s average salary, and each employee’s 
+--te_hours to that department’s average fte_hours.
+
+--[Extension - really tough! - how could you generalise your query to be able to 
+--handle the fact that two or more departments may be tied in their counts of 
+--employees. In that case, we probably don’t want to arbitrarily return details 
+--for employees in just one of these departments].
+--Hints
+--Writing a CTE to calculate the name, average salary and average fte_hours of the 
+--largest department is an efficient way to do this.
+
+--Another solution might involve combining a subquery with window functions
 
 
-select 
-    department ,
-    count(id) as total_in_team,
-    count(grade = 1) as grade_1s,
-    (cast(count(grade =1) as int)/(cast(count(id)))
-from employees e 
-group by department
-
-
-2 Extension
-Some of these problems may need you to do some online research on SQL statements 
-we haven’t seen in the lessons up until now… Don’t worry, we’ll give you pointers, 
-and it’s good practice looking up help and answers online, data analysts and 
-programmers do this all the time! If you get stuck, it might also help to sketch 
-out a rough version of the table you want on paper (the column headings and first 
-few rows are usually enough).
-
-Note that some of these questions may be best answered using CTEs or window 
-functions: have a look at the optional lesson included in today’s notes!
-
-Question 1. [Tough]
-Get a list of the id, first_name, last_name, department, salary and fte_hours of 
-employees in the largest department. Add two extra columns showing the ratio of 
-each employee’s salary to that department’s average salary, and each employee’s 
-te_hours to that department’s average fte_hours.
-
-[Extension - really tough! - how could you generalise your query to be able to 
-handle the fact that two or more departments may be tied in their counts of 
-employees. In that case, we probably don’t want to arbitrarily return details 
-for employees in just one of these departments].
-Hints
-Writing a CTE to calculate the name, average salary and average fte_hours of the 
-largest department is an efficient way to do this.
-
-Another solution might involve combining a subquery with window functions
-
-
-Question 2.
-Have a look again at your table for MVP question 6. It will likely contain a 
-blank cell for the row relating to employees with ‘unknown’ pension enrollment 
-status. This is ambiguous: it would be better if this cell contained ‘unknown’ 
-or something similar. Can you find a way to do this, perhaps using a combination 
-of COALESCE() and CAST(), or a CASE statement?
+--Question 2.
+--Have a look again at your table for MVP question 6. It will likely contain a 
+--blank cell for the row relating to employees with ‘unknown’ pension enrollment 
+--status. This is ambiguous: it would be better if this cell contained ‘unknown’ 
+--or something similar. Can you find a way to do this, perhaps using a combination 
+--of COALESCE() and CAST(), or a CASE statement?
 
 Hints
 COALESCE() lets you substitute a chosen value for NULLs in a column, 
