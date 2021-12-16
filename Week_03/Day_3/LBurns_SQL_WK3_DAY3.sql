@@ -305,6 +305,119 @@ GROUP BY department;
 
 --Another solution might involve combining a subquery with window functions
 
+-- CTE Solution
+
+WITH biggest_dept_details(name, avg_salary, avg_fte_hours) AS (
+  SELECT 
+     department,
+     AVG(salary),
+     AVG(fte_hours)
+  FROM employees
+  GROUP BY department
+  ORDER BY COUNT(id) DESC NULLS LAST
+  LIMIT 1
+)
+SELECT
+  e.id,
+  e.first_name,
+  e.last_name,
+  e.department,
+  e.salary,
+  e.fte_hours,
+  e.salary / bdd.avg_salary AS salary_over_dept_avg,
+  e.fte_hours / bdd.avg_fte_hours AS fte_hours_over_dept_avg
+FROM employees AS e INNER JOIN biggest_dept_details AS bdd
+ON  e.department = bdd.name
+
+-- Window Function Solution
+SELECT 
+    id, 
+    first_name, 
+    last_name, 
+    department,
+    salary,
+    fte_hours,
+    salary / AVG(salary) OVER () AS salary_over_dept_avg,
+    fte_hours / AVG(fte_hours) OVER () AS fte_hours_over_dept_avg
+FROM employees
+WHERE department = (
+  SELECT
+    department
+  FROM employees
+  GROUP BY department
+  ORDER BY COUNT(id) DESC NULLS LAST
+  LIMIT 1
+);
+
+
+--CTE solution for ties
+
+WITH all_dept_details(name, count, avg_salary, avg_fte_hours) AS (
+  SELECT
+    department,
+    COUNT(id),
+    AVG(salary),
+    AVG(fte_hours)
+  FROM employees
+  GROUP BY department
+), 
+biggest_dept_count(max_count) AS (
+  SELECT
+    MAX(count)
+  FROM all_dept_details
+),
+biggest_dept_details AS (
+  SELECT 
+    name,
+    avg_salary,
+    avg_fte_hours
+  FROM all_dept_details INNER JOIN biggest_dept_count
+  ON all_dept_details.count = biggest_dept_count.max_count
+)
+SELECT
+  e.id,
+  e.first_name,
+  e.last_name, 
+  e.department,
+  e.salary,
+  e.fte_hours,
+  e.salary / bdd.avg_salary AS salary_over_dept_avg,
+  e.fte_hours / bdd.avg_fte_hours AS fte_hours_over_dept_avg
+FROM employees AS e INNER JOIN biggest_dept_details AS bdd
+ON e.department = bdd.name
+
+--Window function solution for ties
+SELECT 
+    id, 
+    first_name, 
+    last_name, 
+    department,
+    salary,
+    fte_hours,
+    salary / AVG(salary) OVER (PARTITION BY department) AS salary_over_dept_avg,
+    fte_hours / AVG(fte_hours) OVER (PARTITION BY department) AS fte_hours_over_dept_avg
+FROM employees
+WHERE department IN (
+  SELECT
+    department
+  FROM employees
+  GROUP BY department
+  HAVING COUNT(id) = (
+      SELECT
+          MAX(count)
+      FROM (
+          SELECT
+              department,
+              COUNT(id)
+          FROM employees 
+          GROUP BY department
+      ) AS temp
+  )
+);
+
+
+
+
 
 --Question 2.
 --Have a look again at your table for MVP question 6. It will likely contain a 
@@ -313,30 +426,78 @@ GROUP BY department;
 --or something similar. Can you find a way to do this, perhaps using a combination 
 --of COALESCE() and CAST(), or a CASE statement?
 
-Hints
-COALESCE() lets you substitute a chosen value for NULLs in a column, 
-e.g. COALESCE(text_column, 'unknown') would substitute 'unknown' for every NULL in 
-text_column. The substituted value has to match the data type of the column 
-otherwise PostgreSQL will return an error.
+--Hints
+--COALESCE() lets you substitute a chosen value for NULLs in a column, 
+--e.g. COALESCE(text_column, 'unknown') would substitute 'unknown' for every NULL in 
+--text_column. The substituted value has to match the data type of the column 
+--otherwise PostgreSQL will return an error.
 
-CAST() let’s you change the data type of a column, e.g. CAST(boolean_column AS VARCHAR) 
-will turn TRUE values in boolean_column into text 'true', FALSE to text 'false', 
-and will leave NULLs as NULL
+--CAST() let’s you change the data type of a column, e.g. CAST(boolean_column AS VARCHAR) 
+--will turn TRUE values in boolean_column into text 'true', FALSE to text 'false', 
+--and will leave NULLs as NULL
+
+--A COALESCE() and CAST() solution:
+
+SELECT 
+  COALESCE(CAST(pension_enrol AS VARCHAR), 'unknown') AS pension_enrolled, 
+  COUNT(id) AS num_employees
+FROM employees
+GROUP BY pension_enrol
 
 
-Question 3. Find the first name, last name, email address and start date of all 
-the employees who are members of the ‘Equality and Diversity’ committee. Order 
-the member employees by their length of service in the company, longest first.
+-- A CASE solution:
+
+SELECT 
+  CASE 
+    WHEN pension_enrol IS NULL THEN 'unknown'
+    WHEN pension_enrol IS TRUE THEN 'yes' 
+    ELSE 'no'
+  END AS pension_enrolled, 
+  COUNT(id) AS num_employees
+FROM employees
+GROUP BY pension_enrol
 
 
 
-Question 4. [Tough!]
-Use a CASE() operator to group employees who are members of committees into 
-salary_class of 'low' (salary < 40000) or 'high' (salary >= 40000). A NULL 
-salary should lead to 'none' in salary_class. Count the number of committee 
-members in each salary_class.
 
-Hints
-You likely want to count DISTINCT() employees in each salary_class
+--Question 3. Find the first name, last name, email address and start date of all 
+--the employees who are members of the ‘Equality and Diversity’ committee. Order 
+--the member employees by their length of service in the company, longest first.
 
-You will need to GROUP BY salary_class
+SELECT 
+  e.first_name, 
+  e.last_name, 
+  e.email, 
+  e.start_date
+FROM 
+employees AS e INNER JOIN employees_committees AS ec
+ON e.id = ec.employee_id
+INNER JOIN committees AS c
+ON ec.committee_id = c.id
+WHERE c.name = 'Equality and Diversity'
+ORDER BY e.start_date ASC NULLS LAST
+
+--Question 4. [Tough!]
+--Use a CASE() operator to group employees who are members of committees into 
+--salary_class of 'low' (salary < 40000) or 'high' (salary >= 40000). A NULL 
+--salary should lead to 'none' in salary_class. Count the number of committee 
+--members in each salary_class.
+
+--Hints
+--You likely want to count DISTINCT() employees in each salary_class
+
+--You will need to GROUP BY salary_class
+
+
+SELECT 
+  CASE 
+    WHEN e.salary < 40000 THEN 'low'
+    WHEN e.salary IS NULL THEN 'none'
+    ELSE 'high' 
+  END AS salary_class,
+  COUNT(DISTINCT(e.id)) AS num_committee_members
+FROM employees AS e INNER JOIN employees_committees AS ec
+ON e.id = ec.employee_id
+INNER JOIN committees AS c
+ON ec.committee_id = c.id
+GROUP BY salary_class
