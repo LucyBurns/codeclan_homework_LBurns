@@ -46,6 +46,17 @@ on e.team_id = t.id
 where (cast(t.charge_cost as int)) > 80;
 
 
+-- Alternative Answer
+SELECT 
+  e.first_name, 
+  e.last_name, 
+  t.name AS team_name
+FROM employees AS e INNER JOIN teams AS t
+ON e.team_id = t.id
+WHERE t.charge_cost::INT > 80;
+
+
+
 --Question 2.
 --(a). Get a table of all employees details, together with their 
 -- local_account_no and local_sort_code, if they have them.
@@ -74,6 +85,17 @@ from employees as e left join pay_details as pd
 on e.pay_detail_id = pd.id ;
 
 
+-- Suggested answer
+SELECT 
+  e.*,
+  pd.local_account_no,
+  pd.local_sort_code,
+  t.name AS team_name
+FROM employees AS e LEFT JOIN pay_details AS pd
+ON e.pay_detail_id = pd.id
+LEFT JOIN teams AS t
+ON e.team_id = t.id
+
 
 
 --(b). Amend your query above to also return the name of the team that 
@@ -92,6 +114,8 @@ from
     on pay_detail_id = pd.id )
 inner join teams as t
 on e.team_id = t.id;
+
+-- Note - answer has this as a left join, not inner join
 
 
 
@@ -139,6 +163,14 @@ group by t.name
 order by count(e.id) desc;
 
 
+--Suggested answer - remember to name the computed columns
+SELECT 
+  t.name AS team_name, 
+  COUNT(e.id) AS num_employees
+FROM teams AS t LEFT JOIN employees AS e
+ON e.team_id = t.id
+GROUP BY t.name
+ORDER BY num_employees ASC
 
 
 
@@ -176,6 +208,15 @@ from employees as e left join teams as t
 on e.team_id = t.id 
 group by t.id ;
 
+-- Alternative Answer
+SELECT 
+  t.name,
+  COUNT(e.id) * CAST(t.charge_cost AS INT) AS total_day_charge
+FROM employees AS e
+INNER JOIN teams AS t
+ON e.team_id = t.id
+GROUP BY t.id
+
 
 
 --(c). How would you amend your query from above to show only those teams 
@@ -199,6 +240,17 @@ on t.id = e.team_id
 group by t.name, t.id   )t
 where total_day_charge > 5000;
     
+--Alternative answer
+SELECT 
+  t.name,
+  COUNT(e.id) * CAST(t.charge_cost AS INT) AS total_day_charge
+FROM employees AS e
+INNER JOIN teams AS t
+ON e.team_id = t.id
+GROUP BY t.id
+HAVING COUNT(e.id) * CAST(t.charge_cost AS INT) > 5000
+
+
 
 
 -- 2 Extension
