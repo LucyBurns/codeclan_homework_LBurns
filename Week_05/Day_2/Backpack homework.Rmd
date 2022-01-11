@@ -1,0 +1,288 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(CodeClanData)
+```
+
+# 1 Homework Info
+
+This homework recaps what you learnt in class today.
+
+You'll be looking at the backpack dataset contained within the CodeClanData package using tidyverse. You'll need to load the appropriate packages first.In all plots you make, ensure your labels are appropriate
+
+You must write down a short summary of what each plot tells you in order to meet MVP. Being an analyst is not just the ability to write code, you need to be able to interpret the visualisations and translate the relationships found (or not found) into plain language to explain to non-technical decision makers. Getting as much practice of this as you can while on this course is just (if not more!) important than the code!
+
+# 2 MVP
+
+## Question 1.
+
+Load in the libraries you need, and look at the backpack data. Take note of variable names and dimensions.
+
+```{r}
+backpack <- backpack %>% 
+    clean_names()
+```
+
+```{r}
+colnames(backpack)
+```
+
++-----------------+------------------------------------------+
+| Column Name     | Notes                                    |
++=================+==========================================+
+| backpack_weight | Numeric\                                 |
+|                 | Range 0-35                               |
++-----------------+------------------------------------------+
+| body_weight     | Numeric\                                 |
+|                 | Range 100-280                            |
++-----------------+------------------------------------------+
+| ratio           | Numeric\                                 |
+|                 | 0-0.2                                    |
++-----------------+------------------------------------------+
+| back_problems   | Numeric\                                 |
+|                 | 0-1\                                     |
+|                 | (Note: this should be recoded as binary) |
++-----------------+------------------------------------------+
+| major           | Factor\                                  |
+|                 | 41 Levels                                |
++-----------------+------------------------------------------+
+| year            | Numeric\                                 |
+|                 | 0-6                                      |
++-----------------+------------------------------------------+
+| sex             | Factor\                                  |
+|                 | 2 Levels                                 |
++-----------------+------------------------------------------+
+| status          | Factor\                                  |
+|                 | 2 Levels                                 |
++-----------------+------------------------------------------+
+| units           | Numeric\                                 |
+|                 | 0-20                                     |
++-----------------+------------------------------------------+
+
+: Data Fields
+
+The table has 100 observations with 9 variables.
+
+```{r}
+my_theme <- function() {
+  font <- "Georgia"   #assign font family up front
+  
+  theme_light() %+replace%    #replace elements we want to change
+    
+  theme(
+    # add border
+    panel.border = element_rect(colour = "#484f4f", fill = NA, linetype = 2),
+    
+    # colour background
+    panel.background = element_rect(fill = "white"),
+    
+    # modify grid
+    panel.grid.major = element_line(colour = "#B6A7B5", 
+                                      linetype = 4, size = 0.5),
+    panel.grid.minor = element_blank(),
+    
+    # modify text, axis and colour
+    axis.text = element_text(colour = "#484f4f", size = rel(0.9)),
+    axis.title = element_text(colour = "#484f4f"),
+    axis.ticks = element_line(colour = "#484f4f"),
+ 
+    # modify titles and subtitles
+    plot.title = element_text(colour = "#484f4f", 
+                               size = rel(1.5)),
+    plot.subtitle = element_text(colour = "#484f4f", 
+                                  size = rel(1.1))
+  )
+}
+```
+
+```{r}
+my_palette <- c("#484f4f", "#8ca3a3", "#563f46", "#c8c3cc")
+```
+
+
+## Question 2.
+
+What is the distribution of backpack weights that students are carrying? Choose an appropriate graph to show the distribution.
+
+```{r}
+ggplot(backpack) +
+  aes(x = backpack_weight) +
+  geom_histogram(bins = 20, col = "white") +
+  geom_vline(xintercept = mean(backpack$backpack_weight), 
+             color="red", size = 1.5) +
+    annotate("text",                        
+           x = mean(backpack$backpack_weight) * 1.7,
+           y = mean(backpack$backpack_weight) * 1.7,
+           label = paste("Mean backpack weight =", 
+                         mean(backpack$backpack_weight)),
+           col = "#484f4f",
+           size = 5) +
+  labs(
+    x = "\nBackpack Weight",
+    y = "Count",
+    title = "Backpack Weights\n",
+    )  +
+  my_theme() 
+```
+
+### Analysis
+
+The backpack weights show a fairly normal distribution curve around the mean of 11.66. 
+The data is a little right-skewed with the mean being towards the left of the dataset.
+
+## Question 3.
+
+Are there differences in backpack weight between sex?
+
+```{r}
+ggplot(backpack) +
+  aes(x = backpack_weight, fill = sex) +
+  geom_histogram(bins = 20, col = "white") +
+  
+  labs(
+    x = "\nBackpack Weight",
+    y = "Count",
+    title = "Backpack Weights",
+    subtitle = "Split by gender\n"
+    )  +
+  my_theme() 
+```
+### Analysis
+
+There is little difference between the genders. The one exception is the outlier 
+of one male having a backpack weighing 35.
+
+## Question 4.
+
+What is the relationship between body weight and backpack weight?
+
+```{r}
+
+ggplot(backpack, aes(x=body_weight, y=backpack_weight)) +
+    geom_point(alpha=0.7) +
+  labs(
+    x = "\nBody Weight",
+    y = "Backpack Weight",
+    title = "Comparing body weight to backpack weight\n"
+  ) +
+  my_theme() + 
+  theme(legend.position = "none") 
+
+```
+### Analysis
+
+There appears to be no correlation between body weight and backpack weight.
+Perhaps further statistical analysis will reveal more detail,
+
+## Question 5.
+
+Is this relationship different between men and women? Choose an appropriate plot and interpret your findings.
+
+```{r}
+
+ggplot(backpack, aes(x=body_weight, y=backpack_weight, colour = sex)) +
+    geom_point(alpha=0.7) +
+  labs(
+    x = "\nBody Weight",
+    y = "Backpack Weight",
+    title = "Comparing body weight to backpack weight\n"
+  ) +
+  my_theme() 
+
+
+```
+
+There appears to be a correlation between body weight and backpack weight when the 
+data is split into the genders. Women to have lower body weight and lower backpack
+weight than men.
+
+## Question 6.
+
+What proportion of students report back pain?
+
+```{r}
+backpack$backpain<-ifelse(backpack$back_problems==1,"Yes","No")
+```
+
+
+```{r}
+ggplot(backpack) +
+  aes(x = backpain, stat = "count") +
+  geom_bar(bins = 20, col = "white", fill = "seagreen") +
+
+  labs(
+    x = "\nWhat proportion of students report back pain?",
+    y = "Count",
+    title = "Backpain?\n",
+    )  +
+  my_theme() 
+```
+### Analysis
+
+35% of the students reported having back problems
+
+## Question 7.
+
+Is this proportion different between men and women?
+
+```{r}
+ggplot(backpack) +
+  aes(x = backpain, stat = "count", fill = sex) +
+  geom_bar(bins = 20, col = "white") +
+
+  labs(
+    x = "\nWhat proportion of students report back pain?",
+    y = "Count",
+    title = "Backpain?\n",
+    )  +
+  my_theme() 
+```
+
+### Analysis
+
+Of the students with no back pain the split is approximately 50/50 between males
+and females. Of those with backpain there are approximately three times as many
+females.
+
+
+## Question 8.
+
+Now you've investigated your data separately, create plots to describe the relationship between backpack weight, body weight, gender and reported backpain.
+
+Try both backpack_weight and body_weight as well as the ratio.
+
+Hint: faceting would be useful here.
+
+
+```{r}
+
+ggplot(backpack) +
+  aes(x = backpack_weight, y = body_weight, fill = sex) +
+  geom_col() + 
+  facet_grid(sex ~ backpain) +
+   labs(
+     x = "\nBackpack Weight",
+     y = "Body Weight",
+     title = "Comparing Backpack and Student Data\n",
+   ) +
+  my_theme() +
+  scale_colour_manual(values = my_palette) +
+    theme(legend.position = "none") 
+```
+
+
+
+# 3 Extensions
+
+## Question 1.
+
+Does reported backpain differ across the year groups? Ignore year 0 in your data.
+
+## Question 2.
+
+Is there a difference between how heavy the bags those in different years carry?

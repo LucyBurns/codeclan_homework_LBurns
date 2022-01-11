@@ -41,7 +41,7 @@ ggplot(revenue) +
            fill = product)) + 
   labs(
     x = "\nYear",
-    y = "Revenue",
+    y = "Revenue (£)",
     title = "Sources of Revenue ",
     subtitle = "(for 2018 and 2019)\n",
     fill = "Product" 
@@ -142,7 +142,6 @@ competitors %>%
   scale_colour_manual(values = company_colours) 
 ```
 
-
 ## Question 6.
 
 Now the company wants to compare the number of steps that their device counts vs. their competitors.
@@ -150,29 +149,48 @@ Make a line graph of the number of steps throughout time, and use faceting to co
 The data for this is in qb_device_data.
 
 ```{r}
-device_data <- device_data %>% 
-  unite("time", hours:mins, sep = ":") %>% 
-  mutate(time = as.POSIXct(time, format = "%H:%M")) 
+#device_data <- device_data %>% 
+ # unite("time", hours:mins, sep = ":") %>% 
+  #mutate(time = as.POSIXct(time, format = "%H:%M")) 
 ```
-
 
 ```{r}
 # NOTE THIS IS NOT WORKING CORRECTLY
-ggplot(device_data) 
-  (aes(x = time,y = counts, colour = id)) +
-  geom_line() +
-  scale_x_datetime(labels = time_format(format = "%H:%M")) +
-  facet_wrap(id ~ device) +
-  labs(
-    x = "\nTime",
-    y = "Count of Steps",
-    title = "Step Count",
-    subtitle = "(for Competitors and qikbit1)\n",
-    colour = "Company"
-  )
-  unified_theme()  +
-  scale_colour_manual(values = company_colours) 
+# ggplot(device_data) 
+#   (aes(x = time,y = counts, colour = id)) +
+#   geom_line() +
+#   scale_x_datetime(labels = time_format(format = "%H:%M")) +
+#   facet_wrap(id ~ device) +
+#   labs(
+#     x = "\nTime",
+#     y = "Count of Steps",
+#     title = "Step Count",
+#     subtitle = "(for Competitors and qikbit1)\n",
+#     colour = "Company"
+#   )
+#   unified_theme()  +
+#   scale_colour_manual(values = company_colours) 
 ```
+
+```{r}
+# USING HOMEWORK ANSWERS
+device_data <- 
+mutate(device_data, decimal_hour = hours + (mins/60))
+
+ggplot(device_data) +
+  aes(x = decimal_hour, y = counts) +
+  geom_line(colour = "#BD7040") + 
+  facet_grid(id ~ device) +
+   labs(
+     x = "\nTime",
+     y = "Count of Steps",
+     title = "Step Count",
+     subtitle = "\n(for Competitors and qikbit1)\n",
+     colour = "Company"
+   ) +
+  unified_theme()
+```
+
 
 
 # Part 2
@@ -209,12 +227,9 @@ unified_theme <- function() {
     panel.background = element_rect(fill = "white"),
     
     # modify grid
-    panel.grid.major.x = element_line(colour = "#B6A7B5", 
-                                      linetype = 3, size = 0.5),
-    panel.grid.minor.x = element_blank(),
-    panel.grid.major.y =  element_line(colour = "#B6A7B5", 
-                                       linetype = 3, size = 0.5),
-    panel.grid.minor.y = element_blank(),
+    panel.grid.major = element_line(colour = "#B6A7B5", 
+                                      linetype = 4, size = 0.5),
+    panel.grid.minor = element_blank(),
     
     # modify text, axis and colour
     axis.text = element_text(colour = "#50434F", size = rel(0.9)),
@@ -223,11 +238,23 @@ unified_theme <- function() {
  
     # modify titles and subtitles
     plot.title = element_text(colour = "#50434F", 
-                              family = "Arial", size = rel(1.5)),
+                               size = rel(1.5)),
     plot.subtitle = element_text(colour = "#50434F", 
-                                 family = "Arial", size = rel(1.2))
+                                  size = rel(1.1))
   )
 }
+```
+
+```{r}
+# Theme from answers
+theme_qb <- 
+  theme(
+    text = element_text(size = 12),
+    title = element_text(size = 14),
+    axis.text = element_text(size = 10),
+    panel.background = element_rect(fill = "white"),
+    panel.grid = element_line(colour = "grey90", linetype = "dashed")
+  )
 ```
 
 
