@@ -1,6 +1,8 @@
 ---
 title: "R Notebook"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 
 ```{r}
@@ -104,7 +106,6 @@ my_theme <- function() {
 my_palette <- c("#484f4f", "#8ca3a3", "#563f46", "#c8c3cc")
 ```
 
-
 ## Question 2.
 
 What is the distribution of backpack weights that students are carrying? Choose an appropriate graph to show the distribution.
@@ -132,8 +133,7 @@ ggplot(backpack) +
 
 ### Analysis
 
-The backpack weights show a fairly normal distribution curve around the mean of 11.66. 
-The data is a little right-skewed with the mean being towards the left of the dataset.
+The backpack weights show a fairly normal distribution curve around the mean of 11.66. The data is a little right-skewed with the mean being towards the left of the dataset.
 
 ## Question 3.
 
@@ -152,10 +152,10 @@ ggplot(backpack) +
     )  +
   my_theme() 
 ```
+
 ### Analysis
 
-There is little difference between the genders. The one exception is the outlier 
-of one male having a backpack weighing 35.
+There is little difference between the genders. The one exception is the outlier of one male having a backpack weighing 35.
 
 ## Question 4.
 
@@ -174,10 +174,10 @@ ggplot(backpack, aes(x=body_weight, y=backpack_weight)) +
   theme(legend.position = "none") 
 
 ```
+
 ### Analysis
 
-There appears to be no correlation between body weight and backpack weight.
-Perhaps further statistical analysis will reveal more detail,
+There appears to be no correlation between body weight and backpack weight. Perhaps further statistical analysis will reveal more detail,
 
 ## Question 5.
 
@@ -197,9 +197,7 @@ ggplot(backpack, aes(x=body_weight, y=backpack_weight, colour = sex)) +
 
 ```
 
-There appears to be a correlation between body weight and backpack weight when the 
-data is split into the genders. Women to have lower body weight and lower backpack
-weight than men.
+There appears to be a correlation between body weight and backpack weight when the data is split into the genders. Women to have lower body weight and lower backpack weight than men.
 
 ## Question 6.
 
@@ -208,7 +206,6 @@ What proportion of students report back pain?
 ```{r}
 backpack$backpain<-ifelse(backpack$back_problems==1,"Yes","No")
 ```
-
 
 ```{r}
 ggplot(backpack) +
@@ -222,6 +219,7 @@ ggplot(backpack) +
     )  +
   my_theme() 
 ```
+
 ### Analysis
 
 35% of the students reported having back problems
@@ -245,10 +243,7 @@ ggplot(backpack) +
 
 ### Analysis
 
-Of the students with no back pain the split is approximately 50/50 between males
-and females. Of those with backpain there are approximately three times as many
-females.
-
+Of the students with no back pain the split is approximately 50/50 between males and females. Of those with backpain there are approximately three times as many females.
 
 ## Question 8.
 
@@ -257,7 +252,6 @@ Now you've investigated your data separately, create plots to describe the relat
 Try both backpack_weight and body_weight as well as the ratio.
 
 Hint: faceting would be useful here.
-
 
 ```{r}
 
@@ -275,6 +269,26 @@ ggplot(backpack) +
     theme(legend.position = "none") 
 ```
 
+```{r}
+# Homework answers- alternative solution
+# make the labels nice
+pain_labels <- c("backpain: no", "backpain: yes")
+names(pain_labels) <- c("No", "Yes")
+
+sex_labels <- c("sex: female", "sex: male")
+names(sex_labels) <- c("Female", "Male")
+
+
+ggplot(backpack) + 
+  aes(x = body_weight, y = backpack_weight, color = backpain) + 
+  geom_point() + 
+  facet_grid(sex ~ backpain, 
+             labeller = labeller(backpain = pain_labels, sex = sex_labels)) + 
+  labs(x = "\n body weight", y = "backpack weight \n") +
+      scale_color_manual(values=c('#f0ca41', '#5022bd'))+
+theme(legend.position = "none")
+```
+
 
 
 # 3 Extensions
@@ -283,6 +297,32 @@ ggplot(backpack) +
 
 Does reported backpain differ across the year groups? Ignore year 0 in your data.
 
+```{r}
+# Answer from homework
+subset_backpacks <- backpack %>%
+  filter(year >0) 
+
+# look at the years
+ggplot(subset_backpacks) +
+  geom_bar(aes(x=year, fill = backpain)) + 
+  facet_wrap(~backpain, labeller = "label_both") +
+      scale_fill_manual(values=c('#f0ca41', '#5022bd'))+
+theme(legend.position = "none")
+```
+
+
 ## Question 2.
 
 Is there a difference between how heavy the bags those in different years carry?
+
+
+```{r}
+# Answer from homework
+# is there a difference between how heavy the bags those in different years carry?
+
+ggplot(subset_backpacks)+
+  geom_bar(aes(x=backpack_weight)) + 
+  facet_wrap(~year, ncol = 3) + 
+  xlab("backpack weights")
+```
+
