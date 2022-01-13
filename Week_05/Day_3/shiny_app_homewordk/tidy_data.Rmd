@@ -48,6 +48,18 @@ best_picture_winners <- oscars %>%
 ```
 
 ```{r}
+best_picture_winners <- best_picture_winners %>% 
+  mutate(winning_category = case_when(
+    (category %in% c("BEST PICTURE", "OUTSTANDING PICTURE", "OUTSTANDING PRODUCTION",
+                     "OUTSTANDING MOTION PICTURE","BEST MOTION PICTURE")
+                                                    ~ "Best Picture"),
+    (category %in% c("ACTRESS", "ACTRESS IN A LEADING ROLE") ~ "Best Actress"),
+    (category %in% c("ACTOR", "ACTOR IN A LEADING ROLE") ~ "Best Actor"),
+    TRUE  ~ "other")
+  )
+```
+
+```{r}
 write_csv(best_picture_winners, "data/winners.csv")
 ```
 

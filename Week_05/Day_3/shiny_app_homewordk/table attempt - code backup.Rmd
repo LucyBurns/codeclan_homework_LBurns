@@ -1,3 +1,8 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+```{r}
 library(tidyverse)
 library(shiny)
 library(shinythemes)
@@ -28,39 +33,58 @@ ui <- fluidPage(
                               choices = c("Best Film", "Best Actress", 
                                           "Best Actor")
                  )
-             ),
+    ),
     
     mainPanel(
-      plotOutput("film_plot")
+      renderTable("film_table")
     )
   )
 )
 
 server <- function(input, output) {
   
-  # Changed attempt from table to a simple plot
-  # But this isn't working either
-  # But did fix some filter issues I hadn't noticed
-  
-  output$film_plot <- renderPlot({
+  output$film_table <- renderTable({
    winners %>%
       filter(decades == input$decade_input) %>%
       filter(winning_category == input$category_input) %>% 
-      ggplot() +
-        aes(x=year, y=entity, labels = entity) +
-        geom_point(stat='identity',  size=6)  +
-        geom_text(color="black", size=2)
-        labs(title="Oscar Winners", 
-             subtitle="(by decade") + 
-        coord_flip()
+      film_table <- table(winners$year, winners$entity)
       
       
+      
+      
+    
   })
   
 }
 
 shinyApp(ui = ui, server = server)
+```
 
 
 
+
+
+```{r}
+winners %>% 
+      filter(decades == "1930s") %>%
+      filter(winning_category == "Best Picture") %>% 
+      ggplot() +
+        aes(x=year, y=entity) + 
+        geom_col()  +
+        labs(title="Oscar Winners", 
+             subtitle="(by decade") + 
+        coord_flip()
+```
+
+```{r}
+winners %>% 
+      filter(decades == "1930s") %>%
+      filter(winning_category == "Best Picture") %>% 
+      ggplot() +
+        aes(x=entity, y = year) + 
+        geom_bar()  +
+        labs(title="Oscar Winners", 
+             subtitle="(by decade)") + 
+        coord_flip()
+```
 
