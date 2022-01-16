@@ -1,0 +1,78 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(stringr)
+library(here)
+
+meteorites <- read_csv(here("data/meteorites.csv"))
+
+
+```
+
+```{r}
+meteorites <- meteorites %>% 
+  mutate(pre_1900 = case_when(
+    (year < 1900) ~ "before 1900",
+    TRUE  ~ "1900 or later"))
+
+```
+
+
+```{r}
+
+meteorites <- meteorites %>% 
+  mutate(mass_group = case_when(
+    (mass_g < 1000000) ~ "1mn +",
+    TRUE  ~ "less than 1mn"))
+
+
+```
+
+
+
+
+```{r}
+ggplot(meteorites, aes(x=year, y=latitude, size = mass_g)) +
+    geom_point(alpha=0.7, colour = "seagreen") +
+  labs(
+    x = "\nYear of Fall",
+    y = "Latitiude Recorded",
+    title = "Size of Meteorites",
+    subtitle = "(by year and latitude)\n"
+  ) +
+  theme(legend.position = "none") 
+```
+
+```{r}
+ggplot(meteorites, aes(y=year, x=longitude, size = mass_g)) +
+    geom_point(alpha=0.7, colour = "steelblue") +
+  labs(
+    x = "\nYear of Fall",
+    y = "Longitude Recorded",
+    title = "Size of Meteorites",
+    subtitle = "(by year and longitude)\n"
+  ) +
+  theme(legend.position = "none") 
+
+```
+
+
+```{r}
+ggplot(meteorites, aes(y=latitude, x=longitude, size = mass_g)) +
+    geom_point(alpha=0.7, colour = "red") +
+  labs(
+    x = "Latitude",
+    y = "Longitude",
+    title = "Size of Meteorites",
+    subtitle = "(by latitude and longitude)\n"
+  ) +
+  theme(legend.position = "none") 
+
+
+
+```

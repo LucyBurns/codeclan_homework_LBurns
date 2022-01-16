@@ -2,7 +2,7 @@ library(tidyverse)
 library(shiny)
 library(shinythemes)
 
-winners <- read_csv("data/winners.csv")
+winners <- read_csv("data/winners.csv",col_types = cols(decades = "c"))
 
 # Aim - to produce a simple look up to show what film won best 
 # picture by decade
@@ -12,55 +12,54 @@ ui <- fluidPage(
   
   theme = shinytheme("darkly"),
   titlePanel(tags$h1("Best Picture Winners")),
-  
-  sidebarLayout(
-    sidebarPanel((tags$h4("Make your selection")),
-                 HTML("<br>"),    
-                 selectInput("decade_input",
-                              "Which Decade?",
-                              choices = c("1920s", "1930s", "1940s", "1950s",
-                                          "1960s", "1970s", "1980s", "1990s",
-                                          "2000s", "2010s")
-                 ),
-                 
-                 radioButtons("category_input",
-                              "Which Category?",
-                              choices = c("Best Film", "Best Actress", 
-                                          "Best Actor")
-                 )
-             ),
-    
-    mainPanel(
-      plotOutput("film_plot")
-    )
-  )
-)
 
+  fluidRow(
+    
+    column(6, radioButtons("category_input",
+                           "Category",
+                           choices = unique(winners$winning_category),
+                           inline = TRUE
+          )
+    ),
+    
+    column(6, selectInput(
+                        inputId = "decades_input",
+                        label = "Which Decade?",
+                        choices = unique(winners$decades)
+            )
+        )
+    
+  ),
+  # ---------------------------------
+  # ADD AN ACTION BUTTON
+  
+  actionButton("update","Update Dashboard"),
+
+
+  # -------------------------------------
+  # TABLE
+  
+  DT::dataTableOutput("table_output")
+  
+)  
+  
+# Define server logic required to draw a histogram
 server <- function(input, output) {
   
-  # Changed attempt from table to a simple plot
-  # But this isn't working either
-  # But did fix some filter issues I hadn't noticed
-  
-  output$film_plot <- renderPlot({
-   winners %>%
-      filter(decades == input$decade_input) %>%
+  #NEED A BUTTON THAT IT WAITS FOR
+  filtered_data <- eventReactive(input$update, {
+   winners %>% 
       filter(winning_category == input$category_input) %>% 
-      ggplot() +
-        aes(x=year, y=entity, labels = entity) +
-        geom_point(stat='identity',  size=6)  +
-        geom_text(color="black", size=2)
-        labs(title="Oscar Winners", 
-             subtitle="(by decade") + 
-        coord_flip()
-      
-      
+      filter(decades == input$decades_input) %>% 
+      select(year, entity)
+  })
+  
+# Create the data table
+  output$table_output <- DT::renderDataTable({
+    filtered_data() 
   })
   
 }
 
+# Run the application 
 shinyApp(ui = ui, server = server)
-
-
-
-
