@@ -1,0 +1,154 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+#Titanic Homework
+## Background
+
+A data set detailing the survival or death of passengers and crew members on the RMS Titanic is given in the data folder for this homework - use this data and not the built-in Titanic dataset in R.
+
+Some time after the disaster a journalist wrote that crew members were more likely to have survived the sinking than passengers. This was disputed by a descendant of one of the surviving crew members, who suggested that the opposite was true, i.e. passengers were more likely to have survived than crew.
+
+## Loading packages and importing data
+
+You may want to use prob and gtools later in the homework, and the tidyverse for this section, but if you load prob after tidyverse, dplyr::filter() will be masked. So load your packages in this order:
+
+```{r}
+library(prob)
+library(gtools)
+library(tidyverse)
+library(janitor)
+```
+
+```{r}
+titanic <- read_csv("data/titanic.csv")
+```
+
+## Manipulating Data
+
+```{r}
+
+class_count <- titanic %>% 
+  group_by(class) %>% 
+  summarise(n())
+
+class_count
+```
+
+```{r}
+titanic <- titanic %>% 
+  mutate(
+    crew = case_when(
+      str_detect(class, "crew") ~ TRUE,
+      str_detect(class, "staff") ~ TRUE,
+      TRUE ~ FALSE
+    ),
+    .after = age
+  )
+```
+
+```{r}
+survived_people <- titanic %>% 
+  select("crew", "survived")
+```
+
+```{r}
+# Produces a 2 x 2 table
+table <- survived_people %>% 
+  tabyl(crew, survived)
+
+table
+```
+
+```{r}
+
+table <- table %>% 
+  adorn_totals(where = c("row", "col"))
+
+table
+```
+
+```{r}
+table <- table %>% 
+  adorn_percentages() %>% 
+  adorn_title()
+
+table
+```
+
+## Question
+
+Calculate the conditional probabilities prob(survived∣crew) and prob(survived∣passenger) to settle this dispute.
+
+Have a look at the distinct values of the class variable, this will tell you whether each individual was a passenger (1st, 2nd or 3rd class) or a member of the crew (treat restaurant staff as crew)
+
+## Hints
+
+You may want to create a crew column containing values TRUE or FALSE to help with this For prob(survived∣crew) think 'what proportion of the crew survived?', and similar for prob(survived∣passenger)
+
+## Analysis
+
+prob(survived|Crew) -> probability of surviving given that a person is part of the crew
+prob(survived∣passenger)-> probability of surviving given that a person is a passenger
+
+```{r}
+# probability that person is a crew member
+prob_crew <- survived_people %>% 
+  summarise(prob = sum(crew == TRUE) / n())
+prob_crew
+```
+
+```{r}
+# probability that person is a passenger
+prob_passenger <- survived_people %>% 
+  summarise(prob = sum(crew == FALSE) / n())
+prob_passenger
+```
+
+```{r}
+# probability that person survived
+prob_survived <- survived_people %>% 
+  summarise(prob = sum(survived == "yes") / n())
+prob_survived
+```
+
+```{r}
+# probability crew and survived
+prob_survived_crew <- survived_people %>% 
+    filter(survived == "yes", crew == TRUE) %>% 
+    summarise(prob = n()/ nrow(survived_people))
+prob_survived_crew
+```
+
+```{r}
+# probability passenger and survived
+prob_survived_passenger <- survived_people %>% 
+    filter(survived == "yes", crew == FALSE) %>% 
+    summarise(prob = n()/ nrow(survived_people))
+prob_survived_passenger
+```
+
+
+
+```{r}
+prob_survived_given_crew <- 
+      prob_survived_crew / prob_crew
+
+prob_survived_given_crew
+
+```
+
+```{r}
+prob_survived_given_passenger <- 
+      prob_survived_passenger / prob_passenger
+
+prob_survived_given_passenger
+
+```
+
+## Summary 
+
+The probability of surviving given that a person is part of the crew = 0.2370787	
+
+The probability of surviving given that a person is a passenger = 0.3796507	
