@@ -244,14 +244,13 @@ prob_6_5_4_3_2_1
 The probability of seeing the numbers 6, 5, 4, 3, 2 and 1 in order on the dice, left to right is 1/46656 which R rounds to 0 My calculator tells me it is 0.00002143 - not at all likely then!
 
 ```{r}
-# Hmm - can't get the code to work - but I can work it out manually
 s_6_5_4_3_2_1_any_order <- s_six_dice %>% 
-  isin(., c(1, 2, 3, 4, 5, 6))
+  filter(isin(., c(1, 2, 3, 4, 5, 6), ordered =  FALSE))
 ```
 
 ```{r}
-prob_6_5_4_3_2_1_any_order <- s_six_dice %>% 
-  filter()
+prob <- nrow(s_6_5_4_3_2_1_any_order) / nrow(s_six_dice)
+prob
 ```
 
 Manual working: Combinations of 6, 5, 4, 3, 2, 1 in any order = 6! = 6 x 5 x 4 x 3 x 2 x 1 = 720 We already know there are 46656 possible combinations p(of 6, 5, 4, 3, 2, 1 in any order) = 720/46656 = 0.0153421 - much more likely than in a specific order
@@ -263,3 +262,30 @@ If I draw a single card from a 52-card deck, and it is black, what is the probab
 Hints Investigate the cards() function in the prob package, if you'd like to try this in R (make a deck without jokers). You could think about adding your own black_card random variable to the sample space, which would be TRUE if the suit is 'Spade' or 'Club', and FALSE otherwise.
 
 0.5 - as half of the black deck is clubs, half spades (or 13/26)
+
+```{r}
+# this is a conditional probability problem.
+# possible source of confusion here: the conditioning event comes first
+
+# set up the card draw
+card_draw <- cards(jokers = FALSE)
+
+# add in the conditions to show which are black cards, and which arent
+card_draw <- card_draw %>%
+  mutate(black_card = (suit == "Club" | suit == "Spade"))
+
+# now we can filter the rows we want, and figure out the probability of getting a black spade
+spades_and_black_card <- card_draw %>%
+  filter(black_card == TRUE & suit == "Spade")
+prob_spades_and_black <- nrow(spades_and_black_card) / nrow(card_draw)
+
+# we can figure out the probability of getting a black card now
+black_card <- card_draw %>%
+  filter(black_card == TRUE)
+prob_black <- nrow(black_card) / nrow(card_draw)
+
+# now we can figure out the conditional probability
+prob_spades_given_black <- prob_spades_and_black / prob_black
+prob_spades_given_black
+```
+

@@ -1,0 +1,190 @@
+---
+title: "Week 6: Day 2 Homework"
+output: html_notebook
+editor_options: 
+  markdown: 
+    wrap: 78
+---
+
+# Distributions homework
+
+You are given a cut of a database containing details of mobile phones and
+their customer reviews on an online shopping site in file 20190928-items.csv.
+Each row in the data corresponds to one model of mobile phone. Use the data to
+answer the following questions.
+
+As part of the MVP we want you not to just run the code but also have a go at
+intepreting the results - this is the main learning objective from this
+homework. Don't worry if you aren't sure, it's ok to get it wrong, but give it
+a go, through trying we will learn.
+
+# 1 MVP
+
+## Question 1.
+
+Load the data, clean_names() and explore it.
+
+```{r}
+library(prob)
+library(gtools)
+library(tidyverse)
+library(janitor)
+library(skimr)
+```
+
+```{r}
+mobile_phones <- read_csv("data/20190928-items.csv")
+```
+
+```{r}
+head(mobile_phones)
+```
+
+```{r}
+summarise(mobile_phones)
+```
+
+```{r}
+glimpse(mobile_phones)
+```
+
+## Question 2.
+
+Find the brand with the highest numbers of phones in the dataset.
+
+```{r}
+brands <- mobile_phones %>% 
+  group_by(brand) %>% 
+  summarise(count = n()) %>% 
+  arrange(desc(count))
+
+brands
+
+# Samsung has the highest number of phones in the dataset
+```
+
+## Question 3.
+
+For your top brand, plot the distribution of phone ratings as a probability
+density, overlaying a fitted normal distribution. Do you think the normal
+distribution provides a good model of these ratings? Hint You will need to
+calculate the mean() and sd() of the ratings to plot the appropriate normal
+distribution. Alternatively, investigate using the fitdistr() function in the
+MASS package
+
+```{r}
+# First create a table for just the samsung data
+# We only need the brand and the rating column to simplify
+samsung <- mobile_phones %>% 
+  filter(brand == "Samsung") %>% 
+  select(brand, rating)
+```
+
+```{r}
+# Have a quick look at the stats
+samsung_stats <- samsung %>%
+  summarise(
+    num = n(),
+    mean = mean(rating),
+    sd = sd(rating)
+  )
+samsung_stats
+
+# 397 rows
+# mean rating of 3.5733
+# standard deviation of 0.6847859
+```
+
+```{r}
+# Plot the distribution of phone ratings as a probability
+# density, overlaying a fitted normal distribution
+samsung %>% 
+  ggplot(aes(x = rating)) +
+  geom_histogram(aes(y = ..density..), col = "white", bins = 25) +
+  stat_function(
+    fun = dnorm, 
+    args = list(
+      mean = samsung_stats$mean, 
+      sd = samsung_stats$sd
+    ),
+    col = "red"
+  )
+```
+
+The data is clearly left-skewed, with the tale to the left stretching towards
+the outlying data at 1. Perhaps the outlier is creating the skew and the bulk
+of the data is showing a normal distribution. The bulk of the ratings lie
+between 3 and 4 reflecting the mean of 3.5733.
+
+## Question 4.
+
+We can be more quantitative in comparing the distribution of top brand ratings
+with a normal distribution. You calculated the mean() and sd() of your
+distribution in an earlier question. Use these values to calculate the
+proportions of ratings within one-, two- and three standard deviations of the
+mean. Compare these proportions with those you expect for a normal
+distribution.
+
+Hint You can use a filter() to get only the ratings within one-, two- and
+three standard deviations of the mean, and then think about how to calculate
+what proportion each of these filtered sets make of the total number of
+ratings. You'll need to use three separate filter() and summarise() pipes to
+do this.
+
+Further hint - code to filter within one SD Here's the code to filter and
+summarise the proportion of ratings within one standard deviation of the mean.
+
+```{r}
+  filter(rating >= samsung_stats$mean - samsung_stats$sd) %>%
+  filter(rating <= samsung_stats$mean + samsung_stats$sd) %>%
+  summarise(prop_within_1sd = n() / nrow(samsung_ratings))
+```
+
+```{r}
+# To find the values within one sd we need to filter between 
+# Mean - SD and M + SD
+prop_within_1sd <- samsung %>% 
+  filter(rating >= samsung_stats$mean - samsung_stats$sd) %>%
+  filter(rating <= samsung_stats$mean + samsung_stats$sd) %>%
+  summarise(prop_within_1sd = n() / nrow(samsung)) 
+prop_within_1sd
+```
+
+## Comments for one standard deviation
+
+The proportion of the Samsung ratings within one standard deviation is
+0.7934509 or 79.34% The normal distribution has 68.27% within one sd - so the
+Samsung data is more concentrated.
+
+```{r}
+# To find the values within two sd we need to filter between 
+# Mean - 2*SD and M + 2*SD
+prop_within_2sd <- samsung %>% 
+  filter(rating >= samsung_stats$mean - (2*samsung_stats$sd)) %>%
+  filter(rating <= samsung_stats$mean + (2*samsung_stats$sd)) %>%
+  summarise(prop_within_2sd = n() / nrow(samsung)) 
+prop_within_2sd
+```
+## Comments for two standard deviations
+
+The proportion of the Samsung ratings within two standard deviations is
+0.9193955 or 91.94% The normal distribution has 95.45% within one sd - so the
+Samsung data is less than we would expect for the normal distribution.
+
+```{r}
+# To find the values within three sd we need to filter between 
+# Mean - 3*SD and M + 3*SD
+prop_within_3sd <- samsung %>% 
+  filter(rating >= samsung_stats$mean - (3*samsung_stats$sd)) %>%
+  filter(rating <= samsung_stats$mean + (3*samsung_stats$sd)) %>%
+  summarise(prop_within_3sd = n() / nrow(samsung)) 
+prop_within_3sd
+```
+## Comments for three standard deviations
+
+The proportion of the Samsung ratings within three standard deviations is
+0.9798489 or 97.98% The normal distribution has 95.45% within one sd - so the
+Samsung data is more than we would expect for the normal distribution.
+
+
+
