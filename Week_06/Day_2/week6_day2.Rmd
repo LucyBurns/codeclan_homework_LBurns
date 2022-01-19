@@ -134,11 +134,6 @@ do this.
 Further hint - code to filter within one SD Here's the code to filter and
 summarise the proportion of ratings within one standard deviation of the mean.
 
-```{r}
-  filter(rating >= samsung_stats$mean - samsung_stats$sd) %>%
-  filter(rating <= samsung_stats$mean + samsung_stats$sd) %>%
-  summarise(prop_within_1sd = n() / nrow(samsung_ratings))
-```
 
 ```{r}
 # To find the values within one sd we need to filter between 
@@ -186,5 +181,19 @@ The proportion of the Samsung ratings within three standard deviations is
 0.9798489 or 97.98% The normal distribution has 95.45% within one sd - so the
 Samsung data is more than we would expect for the normal distribution.
 
+### Notes from answers:
+For a normal distribution, expect 68% of values to fall within one standard deviation of the mean. Here, 79% of ratings are within this range, so our distribution is slightly too central.
 
+Adding another standard deviation to either side should increase the proportion of values by 27% to 95% overall in a normal distribution. Our distribution adds 13%, going to 92% overall, so there are too few values in the range from one- to two standard deviations.
+
+Finally, in a normal distribution, adding a further standard deviation to either side should increase the proportion of values by 4.7% to 99.7% overall. Our distribution adds 6% to 98%, so this is pretty close.
+
+## Extension
+Investigate the use of the qqnorm() plot in R to determine whether data is normally distributed. What is a ‘quantile-quantile plot’? What do we expect to see in a qqnorm() plot if data is nearly normally distributed?
+
+```{r}
+# can use base R functions
+qqnorm(samsung$rating)
+qqline(samsung$rating)
+```
 

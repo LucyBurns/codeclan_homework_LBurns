@@ -1,0 +1,158 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(gtools)
+library(tidyverse)
+library(janitor)
+library(skimr)
+library(infer)
+library(boot)
+```
+
+# 1 MVP
+
+Now we'll go back to CI creation in the normal fashion. We'll take the ames data from the CIs lab earlier today and regard it now as a sample, we won't be drawing any smaller samples from within it. This is the usual situation in an analysis: you use all the data available to you!
+
+## Task 1.
+
+Load the data again, clean_names(), and re-familiarise yourself with it
+
+```{r}
+ames <- read_csv("data/ames.csv") %>%  clean_names()
+```
+
+## Task 2.
+
+Investigate the distribution of lot_area. Is the distribution roughly normal? If not, what problems do you find?
+
+```{r}
+ames %>% 
+  ggplot() +
+  aes(x = lot_area) +
+  geom_histogram(col = "white", bins = 25, fill = "violetred4")
+```
+
+A couple of outliers are skewing the data - making it appear right-skewed.
+
+## Task 3.
+
+Compute and visualise a bootstrap sampling distribution for the mean(lot_area) of the sold houses.
+
+```{r}
+ames_summary <- ames %>%
+  summarise(
+    num = n(),
+    mean = mean(lot_area),
+    sd = sd(lot_area)
+  )
+ames_summary
+```
+
+```{r}
+# Create a bootstrap sample with 1000 means in samples of 100
+bootstrap_resample_100 <- ames %>%
+  rep_sample_n(size = 100, replace = TRUE, reps = 1000) %>%
+  dplyr::summarise(
+    mean_lot_area = mean(lot_area)
+  )
+
+bootstrap_resample_100
+```
+
+```{r}
+bootstrap_resample_100 %>% 
+  ggplot() +
+  aes(x = mean_lot_area) +
+  geom_histogram(col = "white", bins = 25, fill = "violetred4")
+```
+
+The bootstrap data appears to give a more normal distribution than the main data set, but outliers are still appearing and skewing the data.
+
+## Task 4.
+
+Use your bootstrap distribution to calculate a 95% CI for mean(lot_area), and visualise it on the distribution
+
+```{r}
+ci_95 <- bootstrap_resample_100 %>% 
+  summarise(mean = mean(mean_lot_area),
+            lower_bound = quantile(mean_lot_area, probs = 0.025),
+            upper_bound = quantile(mean_lot_area, probs = 0.975))
+
+ci_95
+```
+
+The mean lot area is 10143. Statistically 95% of the results will fall between 8989 and 12125.
+
+## Task 5.
+
+You would like to know the mean(lot_area) of the sold houses with higher confidence. Calculate the 99% CI for this variable (you can re-use your bootstrap distribution from above). Is it narrower or broader than the 95% CI? Does that make sense?
+
+```{r}
+ci_99 <- bootstrap_resample_100 %>% 
+  summarise(mean = mean(mean_lot_area),
+            lower_bound = quantile(mean_lot_area, probs = 0.005),
+            upper_bound = quantile(mean_lot_area, probs = 0.995))
+
+ci_99
+```
+
+The mean lot area remains at 10143. Statistically 99% of the results will fall between 8753 and 12607.
+
+## Task 6.
+
+Calculate the point estimate of the mean(lot_area)
+
+```{r}
+summary_bootstrap_resample_100 <- bootstrap_resample_100 %>%
+  ungroup() %>%
+  summarise(
+    mean_mean_lot_area = mean(mean_lot_area)
+  ) 
+
+summary_bootstrap_resample_100
+```
+
+The mean (of the means) is 10143.
+
+# 2 Extension
+
+## Task 1.
+
+Calculate a point estimate and 95% CI for the proportion of houses in the data built before 1920. Does the number of reps you use matter? \[Investigate reps from 200 up to 50000, memory of your laptop permitting\].
+
+```{r}
+# First mutate the data to add in pre/post 1920
+ames <- ames %>% 
+  mutate(before_1920 = if_else(year_built < 1921, "pre 1920", 
+                               "1920 and after"),
+  .after = year_built)
+```
+
+```{r}
+# Create a bootstrap sample with 1000 means in samples of 100
+bootstrap_resample_100 <- ames %>%
+  rep_sample_n(size = 100, replace = TRUE, reps = 1000) %>%
+  dplyr::summarise(
+    mean_lot_area = mean(lot_area)
+  )
+
+bootstrap_resample_100
+```
+
+```{r}
+bootstrap_resample <- ames %>%
+  specify(response = before_1920, success = before_1920) %>%
+  generate(reps = 500, type = "bootstrap") %>%
+  calculate(stat = "prop")
+
+head(bootstrap_resample)
+```
+
+
+Hmmm - clearly not understanding what is being asked for here - and not completed.
+
+Tried with some code Emily had written - but don't think I was using it properly.
+

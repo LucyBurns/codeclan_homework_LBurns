@@ -288,4 +288,3 @@ prob_black <- nrow(black_card) / nrow(card_draw)
 prob_spades_given_black <- prob_spades_and_black / prob_black
 prob_spades_given_black
 ```
-
