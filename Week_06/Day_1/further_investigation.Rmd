@@ -1,0 +1,268 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(prob)
+library(gtools)
+library(tidyverse)
+library(janitor)
+```
+
+```{r}
+titanic <- read_csv("data/titanic.csv")
+```
+
+```{r}
+
+class_count <- titanic %>% 
+  group_by(class) %>% 
+  summarise(n())
+
+class_count
+```
+
+```{r}
+titanic <- titanic %>% 
+  mutate(
+    crew = case_when(
+      str_detect(class, "crew") ~ TRUE,
+      str_detect(class, "staff") ~ TRUE,
+      TRUE ~ FALSE
+    ),
+    .after = age
+  )
+```
+
+```{r}
+# Produces a 2 x 2 table
+class_table <- titanic %>% 
+  tabyl(class, survived)
+
+class_table
+```
+
+```{r}
+
+class_table <- class_table %>% 
+  adorn_totals(where = c("row", "col"))
+
+class_table
+```
+
+```{r}
+class_table_percent <- class_table %>% 
+  adorn_percentages() %>% 
+  adorn_title()
+
+class_table_percent
+```
+
+## Question
+
+Calculate the conditional probabilities prob(survived∣crew) and prob(survived∣passenger) to settle this dispute.
+
+Have a look at the distinct values of the class variable, this will tell you whether each individual was a passenger (1st, 2nd or 3rd class) or a member of the crew (treat restaurant staff as crew)
+
+## Further Analysis
+
+prob(survived|Crew) -> probability of surviving given that a person is part of the crew prob(survived∣passenger)-> probability of surviving given that a person is a passenger
+
+Calculate the conditional probabilities of:
+  prob(survived|1st class | passenger)
+  prob(survived|2nd class | passenger)
+  prob(survived|3rd class | passenger)
+  
+```{r}
+# probability that person is a 1st class passenger 
+first_class <- titanic %>% 
+  summarise(prob = sum(class == "1st") / n())
+first_class
+```
+
+```{r}
+# probability that person is a 2nd class passenger 
+second_class <- titanic %>% 
+  summarise(prob = sum(class == "2nd") / n())
+second_class
+```
+
+```{r}
+# probability that person is a 3rd class passenger 
+third_class <- titanic %>% 
+  summarise(prob = sum(class == "3rd") / n())
+third_class
+```
+
+```{r}
+# probability that person is a passenger
+prob_passenger <- titanic %>% 
+  summarise(prob = sum(crew == FALSE) / n())
+prob_passenger
+```
+
+```{r}
+# probability that person survived
+prob_survived <- titanic %>% 
+  summarise(prob = sum(survived == "yes") / n())
+prob_survived
+```
+
+```{r}
+# probability 1st class and survived
+prob_survived_1st_class <- titanic %>% 
+    filter(survived == "yes", class == "1st") %>% 
+    summarise(prob = n()/ nrow(titanic))
+prob_survived_1st_class
+```
+
+```{r}
+# probability 2nd class and survived
+prob_survived_2nd_class <- titanic %>% 
+    filter(survived == "yes", class == "2nd") %>% 
+    summarise(prob = n()/ nrow(titanic))
+prob_survived_2nd_class
+```
+
+```{r}
+# probability 3rd class and survived
+prob_survived_3rd_class <- titanic %>% 
+    filter(survived == "yes", class == "3rd") %>% 
+    summarise(prob = n()/ nrow(titanic))
+prob_survived_3rd_class
+```
+
+
+```{r}
+# probability passenger and survived
+prob_survived_passenger <- titanic %>% 
+    filter(survived == "yes", crew == FALSE) %>% 
+    summarise(prob = n()/ nrow(titanic))
+prob_survived_passenger
+```
+
+```{r}
+prob_survived_given_passenger <- 
+      prob_survived_passenger / prob_passenger
+
+prob_survived_given_passenger
+
+```
+
+```{r}
+prob_survived_given_1st_class <- 
+      prob_survived_1st_class / first_class
+
+prob_survived_given_1st_class
+
+```
+
+```{r}
+prob_survived_given_2nd_class <- 
+      prob_survived_2nd_class / second_class
+
+prob_survived_given_2nd_class
+
+```
+
+```{r}
+prob_survived_given_3rd_class <- 
+      prob_survived_3rd_class / third_class
+
+prob_survived_given_3rd_class
+
+```
+
+```{r}
+# Crew probabilities
+deck_crew <- titanic %>% 
+  summarise(prob = sum(class == "deck crew") / n())
+deck_crew
+
+engineering_crew <- titanic %>% 
+  summarise(prob = sum(class == "engineering crew") / n())
+engineering_crew
+
+restaurant_staff <- titanic %>% 
+  summarise(prob = sum(class == "restaurant staff") / n())
+restaurant_staff
+
+victualling_crew <- titanic %>% 
+  summarise(prob = sum(class == "victualling crew") / n())
+victualling_crew
+
+```
+
+```{r}
+# probability crew and survived
+prob_survived_deck_crew <- titanic %>% 
+    filter(survived == "yes", class == "deck crew") %>% 
+    summarise(prob = n()/ nrow(titanic))
+prob_survived_deck_crew
+
+prob_survived_engineering_crew <- titanic %>% 
+    filter(survived == "yes", class == "engineering crew") %>% 
+    summarise(prob = n()/ nrow(titanic))
+prob_survived_engineering_crew
+
+prob_survived_restaurant_staff <- titanic %>% 
+    filter(survived == "yes", class == "restaurant staff") %>% 
+    summarise(prob = n()/ nrow(titanic))
+prob_survived_restaurant_staff
+
+prob_survived_victualling_crew <- titanic %>% 
+    filter(survived == "yes", class == "victualling crew") %>% 
+    summarise(prob = n()/ nrow(titanic))
+prob_survived_victualling_crew
+```
+
+```{r}
+prob_survived_given_deck_crew <- 
+      prob_survived_deck_crew / deck_crew
+
+prob_survived_given_engineering_crew <- 
+      prob_survived_engineering_crew / engineering_crew
+
+prob_survived_given_restaurant_staff <- 
+      prob_survived_restaurant_staff / restaurant_staff
+
+prob_survived_given_victualling_crew <- 
+      prob_survived_victualling_crew / victualling_crew
+
+prob_survived_given_deck_crew
+prob_survived_given_engineering_crew
+prob_survived_given_restaurant_staff
+prob_survived_given_victualling_crew
+```
+
+
+
+The probability of surviving given that a person is part of the crew = 0.2370787
+
+The probability of surviving given that a person is a passenger = 0.3796507
+
+The probability of surviving given that a person is a 1st class passenger = 0.6203704	
+The probability of surviving given that a person is a 2nd class passenger = 0.415493
+The probability of surviving given that a person is a 3rd class passenger = 0.2552891
+
+The probability of surviving given that a person is deck crew = 0.6515152	
+The probability of surviving given that a person is engineering crew = 0.2191358
+The probability of surviving given that a person is restaurant staff = 0.04347826	
+The probability of surviving given that a person is victualling crew = 0.2180974	
+
+```{r}
+class <- c("all passengers", "1st class", "2nd class", "3rd class", "all crew", 
+           "deck crew", "engineering crew", "restaurant staff", "victualling crew")
+prob <- c(0.3796507, 0.6203704, 0.415493, 0.2552891, 0.2370787, 0.6515152, 0.2191358, 0.04347826, 0.2180974)
+group <- c("passengers", "passengers", "passengers", "passengers", 
+           "crew", "crew", "crew", "crew", "crew")
+
+prob_survival_by_class <- data.frame(class, prob, group)
+```
+
+```{r}
+ggplot(prob_survival_by_class, aes(fill=class, y=prob, x=group)) + 
+    geom_bar(position="dodge", stat="identity")
+```
+

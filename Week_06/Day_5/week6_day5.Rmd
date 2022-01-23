@@ -1,0 +1,462 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+editor_options:
+  markdown:
+    wrap: 72
+---
+
+# 1 MVP
+
+## 1.1 Hypothesis testing - practical
+
+You work for an animal conservation organisation and are looking to do
+some investigating into some of the animals to provide evidence for some
+projects you are looking to run.
+
+In this homework we'll use the msleep data set provided in the ggplot
+package. It concerns the sleeping patterns of various types of mammal.
+
+```{r}
+library(gtools)
+library(tidyverse)
+library(janitor)
+library(skimr)
+library(infer)
+library(boot)
+```
+
+```{r}
+data(msleep)
+```
+
+### Question 1.
+
+Explore the dataset and familiarise yourself with it.
+
+Database conntains 83 observations with 11 variables
+
+```{r}
+genus_count <- msleep %>% 
+  group_by(genus) %>% 
+  summarise(n())
+genus_count
+```
+
+```{r}
+vore_count <- msleep %>% 
+  group_by(vore) %>% 
+  summarise(n())
+vore_count
+```
+
+19 carnnivores 32 herbivores 5 insectivores 20 omnivores
+
+```{r}
+order_count <- msleep %>% 
+  group_by(order) %>% 
+  summarise(n())
+order_count
+```
+
+19 different orders
+
+### Question 2.
+
+Jabberwockies sleep for around 7 hours a night, on average. Perform an
+appropriate statistical test to determine whether the mean sleep_total
+in the sampled population of animal types differs from the typical value
+for jabberwockies.
+
+The correct test to apply is one sample mean against a specified value.
+
+Null hypothesis: The null hypothesis is that the mean sleep_total in the
+sampled population is the same as the average for the jabberwockies
+(around 7 hours) The alternative hypothesis is that the mean sleep_total
+in the sampled population is not the same as the average for the
+jabberwockies (around 7 hours)
+
+Hypothesis Test: H0: mu_av_rating = 7 H1: mu_av_rating =/= 7
+
+Statistic: x(mean) = 7
+
+Confidence level: alpha = 0.05
+
+```{r}
+# Let's have a look at the data
+msleep %>% 
+  ggplot(aes(x = sleep_total)) +
+  geom_histogram(col = "white", fill = "seagreen")
+```
+
+```{r}
+msleep %>% 
+  ggplot(aes(x = sleep_total)) +
+  geom_boxplot()
+```
+
+Just glimpsing at the data suggests the mean from the sample to be
+higher than the jabberwocky average of 7.0 - but let's test it.
+
+Hypotheses:
+
+-   H0: mean µ = 7.00
+
+-   H1: mean µ ≠ 7.00
+
+```{r}
+observed_stat <- msleep %>% 
+  summarise (mean_rating = mean(sleep_total))
+
+observed_stat
+```
+
+```{r}
+# Calculate the null sampling distribution
+# point - we are testing one value
+# mu is the mean
+null_distribution <- msleep %>% 
+  specify(response = sleep_total) %>% 
+  hypothesise(null = "point", mu = 7.00) %>% 
+  generate(reps = 10000, type = "bootstrap") %>% 
+  calculate(stat = "mean")
+```
+
+```{r}
+null_distribution %>% 
+  visualise(bins = 30)
+```
+
+```{r}
+# Visualise the results
+# shade_pvalue gives different ways of shading in the distribution graph
+# using both shades in significantly greater and lower than the test statistic
+# the graph shows the p-value
+# the shading shows us the corresponding extremes
+# are we in the extreme 5%? 
+
+null_distribution %>% 
+  visualise(bins = 30) +
+  shade_pvalue(obs_stat = observed_stat$mean_rating,
+               direction = "both")
+```
+
+```{r}
+p_value <- null_distribution %>% 
+  get_p_value(obs_stat = observed_stat$mean_rating,
+              direction = "both")
+
+p_value
+```
+
+The p-value is very small, much smaller than 0.01, and definitely
+smaller than the 0.05 we are testing against.
+
+SO - this is significantly different and we can reject the null
+hypothesis
+
+At the 5% confidence level, we reject H0, in favour of H1.
+
+The average sleep of the animals in the sampled population 10.43 is
+significantly different to the value of 7.00 recorded in jabberwockies.
+
+
+
+### Question 3.
+
+Perform an appropriate statistical test to determine whether omnivores
+sleep for significantly longer than herbivores, on average.
+
+Let’s set up our hypotheses:
+
+  H0: Omnivores mean - Herbivores mean = 0 
+  H1: Omnivores mean - Herbivores mean > 0
+  
+  alpha = 0.05
+    
+```{r}
+# Create omnivore table
+omnivores <- msleep %>% 
+  filter(vore == "omni")
+
+# Create herbivore table
+herbivores <- msleep %>% 
+  filter(vore == "herbi")
+```
+
+```{r}
+# Combine the two datasets
+omni_herbi <- bind_rows(omnivores, herbivores, .id = "vore") %>%
+                mutate(vore = ifelse(vore == "1", "omni", "herbi")) 
+
+head(omni_herbi)
+```
+
+```{r}
+omni_herbi %>%
+  ggplot(aes(y = sleep_total, x = vore)) +
+  geom_boxplot()
+```
+
+Comparing the box plots of the two types of animals shows an interesting contrast. The herbivores have a much larger range, compared to the omnivores but the mean appears to be similar.
+
+```{r}
+null_distribution <- omni_herbi %>% 
+  specify(sleep_total ~ vore) %>% 
+  
+#it is the relationship between the total sleep and the type of animal we are testing. 
+  
+  hypothesise(null = "independence") %>% 
+#the null hypothesis is there is no relationship i.e. they are independent
+  
+  generate(reps = 1000, type = "permute") %>% 
+  calculate(stat = "diff in means", order = c("omni", "herbi")) 
+#our sample stat is mean of algarve minus mean of nice, so this is the order we specify in the calculate step
+
+head(null_distribution)
+```
+
+```{r}
+observed_stat <- omni_herbi %>% 
+  specify(sleep_total ~ vore) %>% 
+  calculate(stat = "diff in means", order = c("omni", "herbi")) 
+  
+observed_stat
+```
+
+```{r}
+null_distribution %>%
+  visualise() +
+  shade_p_value(obs_stat = observed_stat, direction = "right")
+# direction is right as it is a greater than test
+```
+The observed stat is on the  right of the distribution
+So we see from the visualisation that the observed statistic is on right of our null distribution. So there is a probability of getting a more extreme value than ours under H0. Let’s calculate the p-value.
+
+```{r}
+p_value <- null_distribution %>%
+  get_p_value(obs_stat = observed_stat, direction = "right")
+
+p_value
+```
+
+The p-value is larger than our critical value of 0.05 and so we cannot reject H0. We can therefore not say if there is a substantial difference between the means of the omnivores and the herbivores.
+
+
+### Question 4.
+
+Perform an appropriate statistical test to determine whether the
+proportion of domesticated animal types in the population of animal
+types is greater than 5%.
+
+Hint Think about creating an is_domesticated variable for the analysis
+
+## 1.2 Hypothesis testing - Defining the Hypothesis
+
+For the following three business problems write out:
+
+What kind of test you would use H0 and Ha in both mathematical notation
+and in words. Also state the method you would use to generate the null
+distribution (bootstrap, permutation or simulation).
+
+### Question 1.
+
+You work for a independent coffee shop. The boss tells you that she
+thinks that around 40% of people in the town (population 30,000) know of
+the coffee shop, but you are sceptical of the estimate. You conduct a
+random survey of 200 people in the town, asking if respondents are aware
+of your coffee shop. You want to use the sample to test the hypothesis
+that 40% or more of the town's population have heard of the coffee shop.
+
+### Question 2.
+
+You work for a website design company and have performed an A/B test on
+the position of a banner on a website promoting a particular item.
+
+A/B testing A method comparing two versions of a web page, email, flyer
+or other marketing device against each other to determine which version
+performs better. As it is essentially a controlled experiment, the
+design should try to ensure that the groups experiencing both versions
+of the marketing device are equivalent and representative of the
+population.
+
+You selected five days at random last month and then randomly selected
+200 of each sampled day's users into group A and another 200 of that
+day's users into group B. Group A continued to be shown the banner at
+the right hand side of the webpage (its usual position) while group B
+was shown the banner at the top of the page. You monitored each sampled
+user's interactions with the website, in particular the 'click through
+rate' (CTR) on the banner, i.e. what proportion of sampled users clicked
+on the banner. You want to use the sampled data to test the hypothesis
+that website users overall are more likely to click on the banner if
+positioned at the top of the page
+
+### Question 3.
+
+You work as an analyst for a car manufacturing company - they have
+specific standards they must meet for standards and regulation purposes.
+You have been asked to check the quality control of the manufacture of a
+particular car part. You have been given data on a sample of 200 parts
+produced over the period of a week (the sampled parts were pulled at
+random from the production line and measured: the factory produced a lot
+more than 200 parts that week). The specification of the part stipulates
+a width of 145mm, and the manufacturing process is said to have
+'drifted' if the mean width of parts differs significantly from 145mm.
+You want to use the sampled measurements to test whether the process
+overall has drifted.
+
+## 1.3 Hypothesis Testing - Interpreting the results
+
+For the 3 business problems stated above, imagine we performed you got
+the following p-values (with the given significance levels) write out
+your interpretation of the results.
+
+### Question 1.
+
+Coffee shop problem. Significance level: 0.05, calculated p-value: 0.07
+
+### Question 2.
+
+Website company problem. Significance level: 0.01, p-value: 0.006
+
+### Question 3.
+
+Manufacturing company problem. Significance level: 0.05, p-value: 0.55
+
+# 2 Extension
+
+## 2.1 Market Basket Analysis
+
+Association rule mining is regularly used by retailers to find
+associations between products that people purchase, perhaps for an
+online retailer, the items that people put together in their 'baskets',
+and in a bricks and mortar retailer, the items purchased together in a
+single transaction. The aim is to find recurring patterns in the
+transactions which the retailer can then use to do targeted marketing of
+items, seeking to increase 'cross sales'. Rules mining of this sort can
+also be used in other industries beyond retail to identify patterns in
+data.
+
+Market basket analysis (MBA) uses association rule mining. It looks at
+the association of items occurring in a single basket, and so won't look
+at your purchases over time, but only items that are purchased together
+in a single purchase (i.e. a 'basket'). As a good example, you may have
+seen the 'Frequently Bought Together' section on Amazon (and other
+sites), which looks at items you've got in your basket and suggests
+items that other people commonly have in their baskets when they also
+have these items:
+
+MBA differs from recommendation algorithms because the association rules
+look only at items bought together in a single purchase, they don't use
+any characteristics of the purchaser to profile them (e.g. 'Based on
+purchases by people like you, you may also like...') or how their
+purchases vary over time. The association rules used for MBA use the
+probability principles we learned on Monday this week.
+
+## 2.2 Association rules
+
+The rules obtained by MBA have three concepts associated with them, as
+follows:
+
+Support The probability of items in the rule being purchased together:
+
+e.g. sup(A→B)=P(A and B being purchased together)=number of transactions
+involving A and Btotal number of transactions
+
+Support also has meaning for single items:
+
+e.g. sup(A)=P(A)=number of transactions involving Atotal number of
+transactions
+
+Confidence The proportion of purchases of A where B has also been
+purchased:
+
+e.g. conf(A→B)=P(A and B being purchased together)P(A being purchased)
+
+Lift Increase in sales of A when sold with B
+
+lift(A→B)=sup(A→B)sup(A)×sup(B)
+
+If sup(A→B)=sup(A)×sup(B) then this means P(A and B)=P(A)×P(B). We know
+from the probability lesson earlier in the week that this means the
+purchase of A and B are independent events. This may help with our
+interpretation of lift values:
+
+lift(A→B)\>1 - items A and B are more likely to be bought together
+lift(A→B)=1 - no correlation between items A and B being bought together
+lift(A→B)\<1 - items A and B are unlikely to be bought together A and B
+don't need to be single items, they could be sets of items (itemsets)
+e.g. A = {TV, DVD player}, B = {TV stand}.
+
+## 2.3 Using the rules
+
+Once we have calculated the rules we can use them to gain insights about
+items/itemsets.
+
+For example, if for items A and B the corresponding rule (A→B) has a low
+support but a lift greater than 1 then we can say that when A is
+purchased B is often purchased with it (high lift), but such
+transactions don't happen all that frequently (low support).
+
+The apriori algorithm is often used as a way of selecting 'interesting'
+rules. It will calculate all the support, confidence and lift values for
+the item/itemset combinations of your dataset and will return those with
+support values greater than a pre-defined threshold value set by the
+user.
+
+## 2.4 Homework exercise
+
+Let's load in some transaction data which has details on the items
+purchased in each transaction (where each transaction is uniquely
+identified by the InvoiceNo variable).
+
+library(tidyverse) transactions \<-
+read_csv("data/online_retail_subset.csv")
+
+## 2.5 Association rules
+
+For the first section we are interested in the purchase of two
+particular items:
+
+item A - 'HEART OF WICKER SMALL' (StockCode 22469) item B - 'LARGE CAKE
+TOWEL PINK SPOTS' (StockCode 21110) \#\#\# Question 1. Calculate the
+support for item A (this will be the support for a single item)
+
+### Question 2.
+
+Calculate the support and confidence for rule (A→B).
+
+### Question 3.
+
+Calculate the lift for (A→B)
+
+Hint You will need to calculate the support for B
+
+## 2.6 Apriori algorithm
+
+Read up on the arules and arulesViz packages, which make use of the
+'apriori' algorithm
+<http://www.salemmarafi.com/code/market-basket-analysis-with-r/comment-page-1/>
+
+Use these packages to play around, applying the apriori algorithm to the
+transactions dataset we have.
+
+To use the arules package we need the data to be a special type of
+'transactions' object. We do this by reading in the data using
+read.transactions() function from the arules package. We have done this
+for you below (for more information on this type of transactions object
+see the helpfile ?transactions):
+
+Now you're all set to play around with arules and arulesViz.
+
+Warning about run time/memory usage: if the minimum support is set too
+low for the dataset, then the algorithm will try to create an extremely
+large set of itemsets/rules. This will result in very long run times and
+the process may eventually run out of memory. You can either start by
+trying a reasonably high support (for this dataset, we would suggest
+starting at 1 and then systematically lower the support if don't see any
+results). There is also an argument maxtime which can be used to prevent
+long run times (more information on that in the apriori user document
+here).

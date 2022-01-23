@@ -90,7 +90,7 @@ You may want to create a crew column containing values TRUE or FALSE to help wit
 
 ## Analysis
 
-prob(survived\|Crew) -> probability of surviving given that a person is part of the crew prob(survived∣passenger)-> probability of surviving given that a person is a passenger
+prob(survived|Crew) -> probability of surviving given that a person is part of the crew prob(survived∣passenger)-> probability of surviving given that a person is a passenger
 
 ```{r}
 # probability that person is a crew member
