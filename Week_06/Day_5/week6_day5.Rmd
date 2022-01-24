@@ -162,20 +162,18 @@ At the 5% confidence level, we reject H0, in favour of H1.
 The average sleep of the animals in the sampled population 10.43 is
 significantly different to the value of 7.00 recorded in jabberwockies.
 
-
-
 ### Question 3.
 
 Perform an appropriate statistical test to determine whether omnivores
 sleep for significantly longer than herbivores, on average.
 
-Let’s set up our hypotheses:
+Let's set up our hypotheses:
 
-  H0: Omnivores mean - Herbivores mean = 0 
-  H1: Omnivores mean - Herbivores mean > 0
-  
-  alpha = 0.05
-    
+H0: Omnivores mean - Herbivores mean = 0 H1: Omnivores mean - Herbivores
+mean \> 0
+
+alpha = 0.05
+
 ```{r}
 # Create omnivore table
 omnivores <- msleep %>% 
@@ -200,7 +198,9 @@ omni_herbi %>%
   geom_boxplot()
 ```
 
-Comparing the box plots of the two types of animals shows an interesting contrast. The herbivores have a much larger range, compared to the omnivores but the mean appears to be similar.
+Comparing the box plots of the two types of animals shows an interesting
+contrast. The herbivores have a much larger range, compared to the
+omnivores but the mean appears to be similar.
 
 ```{r}
 null_distribution <- omni_herbi %>% 
@@ -232,8 +232,11 @@ null_distribution %>%
   shade_p_value(obs_stat = observed_stat, direction = "right")
 # direction is right as it is a greater than test
 ```
-The observed stat is on the  right of the distribution
-So we see from the visualisation that the observed statistic is on right of our null distribution. So there is a probability of getting a more extreme value than ours under H0. Let’s calculate the p-value.
+
+The observed stat is on the right of the distribution So we see from the
+visualisation that the observed statistic is on right of our null
+distribution. So there is a probability of getting a more extreme value
+than ours under H0. Let's calculate the p-value.
 
 ```{r}
 p_value <- null_distribution %>%
@@ -242,8 +245,9 @@ p_value <- null_distribution %>%
 p_value
 ```
 
-The p-value is larger than our critical value of 0.05 and so we cannot reject H0. We can therefore not say if there is a substantial difference between the means of the omnivores and the herbivores.
-
+The p-value is larger than our critical value of 0.05 and so we cannot
+reject H0. We can therefore not say if there is a substantial difference
+between the means of the omnivores and the herbivores.
 
 ### Question 4.
 
@@ -265,14 +269,15 @@ msleep <- msleep %>%
 
 ```
 
-We would like to test whether the proportion of domesticated animal types in the population of animal types is greater than 5% (at a significance level α=0.05).
+We would like to test whether the proportion of domesticated animal
+types in the population of animal types is greater than 5% (at a
+significance level α=0.05).
 
 One-sample (indep) HT: proportions
 
 Alpha = 0.05
 
-H0: proportion of animals = 5
-Ha: proportion of animals > 5
+H0: proportion of animals = 5 Ha: proportion of animals \> 5
 
 Two-sided test at 5% confidence level
 
@@ -291,7 +296,7 @@ null_distribution2 <- msleep %>%
   specify(response = domesticated,
           success = "domesticated") %>% 
   hypothesise(null = "point",
-              p = 0.07) %>% 
+              p = 0.05) %>% 
   generate(reps = 5000,
            type = "draw") %>% 
   calculate(stat = "prop")
@@ -313,12 +318,77 @@ observed_stat
 
 ```{r}
 null_distribution2 %>% 
-  visualise(bins = 30) +
+  visualise(bins = 15) +
   shade_pvalue(obs_stat = observed_stat,
                direction = "both")
 ```
-Conclusion - we can reject the null hypothesis and accept that it is significantly likely that the number of animals that are domesticated is likely to be greater than 5%.
 
+Conclusion - we can reject the null hypothesis and accept that it is
+significantly likely that the number of animals that are domesticated is
+likely to be greater than 5%.
+
+#### Answers from homework solutions
+
+```{r}
+msleep %>%
+  distinct(conservation)
+```
+
+```{r}
+msleep_domesticated <- msleep %>%
+  mutate(is_domesticated = conservation == "domesticated") %>%
+  filter(!is.na(is_domesticated))
+```
+
+```{r}
+null_distribution3 <- msleep_domesticated %>%
+  specify(response = is_domesticated, success = "TRUE") %>%
+  hypothesize(null = "point", p = 0.05) %>%
+  generate(reps = 10000, type = "simulate") %>%
+  calculate(stat = "prop")
+
+obs_stat <- msleep_domesticated %>%
+  specify(response = is_domesticated, success = "TRUE") %>%
+  calculate(stat = "prop")
+
+null_distribution3 %>%
+  visualise() +
+  shade_p_value(direction = "right", obs_stat = obs_stat)
+```
+
+```{r}
+null_distribution3 %>%
+  get_p_value(direction = "right", obs_stat = obs_stat)
+```
+
+The p-value is less than α, so we reject H0 and accept that the
+proportion of domesticated animal types in the data is significantly
+greater than 5%.
+
+Could also do this by bootstrapping a numerical flag: we should get
+reasonably similar results, but more quickly
+
+```{r}
+msleep_domesticated_flag <- msleep %>%
+  mutate(domesticated_flag = if_else(conservation == "domesticated", 1, 0))
+
+null_distribution <- msleep_domesticated_flag %>%
+  specify(response = domesticated_flag) %>%
+  hypothesize(null = "point", mu = 0.05) %>%
+  generate(reps = 10000, type = "bootstrap") %>%
+  calculate(stat = "mean")
+```
+
+```{r}
+null_distribution %>%
+  visualise() +
+  shade_p_value(direction = "right", obs_stat = obs_stat)
+```
+
+```{r}
+null_distribution %>%
+  get_p_value(direction = "right", obs_stat = obs_stat)
+```
 
 ## 1.2 Hypothesis testing - Defining the Hypothesis
 
@@ -338,8 +408,21 @@ of your coffee shop. You want to use the sample to test the hypothesis
 that 40% or more of the town's population have heard of the coffee shop.
 
 #### Answer
-The best test for this example would be the one-sample proportion using simulation to create a null distribution.
 
+The best test for this example would be the one-sample proportion using
+simulation to create a null distribution.
+
+#### Answer from solutions
+
+Test One-sample proportion, right-sided.
+
+Words H0: the proportion of the town population who are aware of the
+shop is 40% (or lower) Ha: the proportion of the town population who are
+aware of the shop is greater than 40%
+
+Maths H0: πawareness=0.4 Ha: πawareness>0.4
+
+Null distribution generation Simulation
 
 ### Question 2.
 
@@ -365,8 +448,28 @@ that website users overall are more likely to click on the banner if
 positioned at the top of the page
 
 #### Answer
-The best test for this example would be an independent two-sample test using proportions. Randomly permutatiing samples to create a null distribution for analysis.
 
+The best test for this example would be an independent two-sample test
+using proportions. Randomly permutatiing samples to create a null
+distribution for analysis.
+
+#### Answer from solutions
+
+We would only want to change the page if the CTR for the new banner
+position was significantly higher than the CTR for the usual banner
+position.
+
+Test Two-samples proportion, right-sided.
+
+Words H0: the CTR with the banner at the top of the website is the same
+as (or less than) the CTR with the banner at the right hand side of the
+website. Ha: the CTR with the banner at the top of the website is
+greater than the CTR with the banner at the right hand side of the
+website.
+
+Maths H0: πCTR(top)−πCTR(right)=0 Ha: πCTR(top)−πCTR(right)>0
+
+Null distribution generation Permutation
 
 ### Question 3.
 
@@ -383,8 +486,24 @@ You want to use the sampled measurements to test whether the process
 overall has drifted.
 
 #### Answer
-This would be a one-sample mean where you will compare the sample to the known mean. Bootstrapping can be used here to repeat the process and determine if the size of the part has changed.
 
+This would be a one-sample mean where you will compare the sample to the
+known mean. Bootstrapping can be used here to repeat the process and
+determine if the size of the part has changed.
+
+#### Answer from solutions
+
+Would want to know whether the mean width differs significantly from
+145mm, whether it be larger or smaller.
+
+Test One-sample mean test, two-sided.
+
+Words H0: the mean width of the parts produced that week equals 145mm
+Ha: the mean width of the parts produced that week differs from 145mm
+
+Maths H0: μwidth=145 Ha: μwidth≠145
+
+Null distribution generation Bootstrap
 
 ## 1.3 Hypothesis Testing - Interpreting the results
 
@@ -395,22 +514,28 @@ your interpretation of the results.
 ### Question 1.
 
 Coffee shop problem. Significance level: 0.05, calculated p-value: 0.07
-The p-value is greater than the selected significance level of 0.05 so we lack sufficient evidence to reject the null hypothesis. We do not have enough evidence that the proportion is statistically different from the null value.
+The p-value is greater than the selected significance level of 0.05 so
+we lack sufficient evidence to reject the null hypothesis. We do not
+have enough evidence that the proportion is statistically different from
+the null value.
 
 ### Question 2.
 
 Website company problem. Significance level: 0.01, p-value: 0.006
 
-The p-value is significantly smaller than the significance level - so we have found enough evidence in the sample to suggest that there is significant difference between the two website tests.
+The p-value is significantly smaller than the significance level - so we
+have found enough evidence in the sample to suggest that there is
+significant difference between the two website tests.
 
 ### Question 3.
 
 Manufacturing company problem. Significance level: 0.05, p-value: 0.55
 
-The p-value is higher than the significance level of 0.05 so we we lack sufficient evidence to reject the null hypothesis. Based on the sample, we do not have enough evidence that the average size of the car part is statistically significantly different from, less than or greater than the null value.
-
-
-
+The p-value is higher than the significance level of 0.05 so we we lack
+sufficient evidence to reject the null hypothesis. Based on the sample,
+we do not have enough evidence that the average size of the car part is
+statistically significantly different from, less than or greater than
+the null value.
 
 # 2 Extension
 
@@ -471,7 +596,7 @@ from the probability lesson earlier in the week that this means the
 purchase of A and B are independent events. This may help with our
 interpretation of lift values:
 
-lift(A→B)\>1 - items A and B are more likely to be bought together
+lift(A→B)>1 - items A and B are more likely to be bought together
 lift(A→B)=1 - no correlation between items A and B being bought together
 lift(A→B)\<1 - items A and B are unlikely to be bought together A and B
 don't need to be single items, they could be sets of items (itemsets)
@@ -508,7 +633,7 @@ For the first section we are interested in the purchase of two
 particular items:
 
 item A - 'HEART OF WICKER SMALL' (StockCode 22469) item B - 'LARGE CAKE
-TOWEL PINK SPOTS' (StockCode 21110) \#\#\# Question 1. Calculate the
+TOWEL PINK SPOTS' (StockCode 21110) ##\# Question 1. Calculate the
 support for item A (this will be the support for a single item)
 
 ### Question 2.
