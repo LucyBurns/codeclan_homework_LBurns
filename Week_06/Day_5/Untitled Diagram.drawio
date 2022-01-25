@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2022-01-25T15:31:11.260Z" agent="5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36" etag="cQLkG_FNOfNXZUF8kbQZ" version="16.4.5" type="github">
+<mxfile host="app.diagrams.net" modified="2022-01-25T15:34:08.447Z" agent="5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36" etag="gNemyGAimbkXv1mldzm1" version="16.4.5" type="github">
   <diagram name="Page-1" id="c7558073-3199-34d8-9f00-42111426c3f3">
     <mxGraphModel dx="950" dy="807" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="826" pageHeight="1169" background="none" math="0" shadow="0">
       <root>
@@ -14,7 +14,7 @@
           <mxGeometry x="102.5" y="97" width="99" height="56" as="geometry" />
         </mxCell>
         <mxCell id="DKgWzSn5s0b5Owi-XkWh-106" value="" style="group" vertex="1" connectable="0" parent="1">
-          <mxGeometry x="340" y="300" width="240" height="160" as="geometry" />
+          <mxGeometry x="490" y="370" width="240" height="160" as="geometry" />
         </mxCell>
         <mxCell id="DKgWzSn5s0b5Owi-XkWh-104" value="&lt;p style=&quot;text-align: center ; margin: 4px 0px 0px ; text-decoration: underline&quot;&gt;Bike Station (End)&lt;/p&gt;&lt;p style=&quot;margin: 4px 0px 0px&quot;&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;span style=&quot;text-align: center&quot;&gt;End&lt;/span&gt;_station&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;text-align: center&quot;&gt;End&lt;/span&gt;_lat&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;text-align: center&quot;&gt;End&lt;/span&gt;_long&lt;/li&gt;&lt;/ul&gt;&lt;div&gt;&lt;span style=&quot;white-space: pre&quot;&gt;	&lt;/span&gt;The location of each bike station is&lt;br&gt;&lt;span style=&quot;white-space: pre&quot;&gt;	&lt;/span&gt;known&lt;br&gt;&lt;br&gt;&lt;span style=&quot;white-space: pre&quot;&gt;	&lt;/span&gt;Note: the start and the end station&lt;br&gt;&lt;span&gt;	&lt;/span&gt;&lt;span style=&quot;white-space: pre&quot;&gt;	&lt;/span&gt;can be the same&lt;br&gt;&lt;/div&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;&lt;/p&gt;" style="verticalAlign=middle;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;rounded=1;fontStyle=1;strokeWidth=3;fillColor=#dae8fc;arcSize=23;strokeColor=#6c8ebf;" vertex="1" parent="DKgWzSn5s0b5Owi-XkWh-106">
           <mxGeometry width="239.99999999999997" height="160" as="geometry" />
@@ -97,11 +97,16 @@
         </mxCell>
         <mxCell id="DKgWzSn5s0b5Owi-XkWh-137" style="edgeStyle=orthogonalEdgeStyle;curved=0;rounded=1;sketch=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#999999;strokeWidth=4;exitX=0.44;exitY=1.008;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="DKgWzSn5s0b5Owi-XkWh-125">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="580" y="390" as="targetPoint" />
+            <mxPoint x="730" y="460" as="targetPoint" />
             <Array as="points">
-              <mxPoint x="678" y="390" />
+              <mxPoint x="678" y="350" />
+              <mxPoint x="780" y="350" />
+              <mxPoint x="780" y="460" />
             </Array>
           </mxGeometry>
+        </mxCell>
+        <mxCell id="DKgWzSn5s0b5Owi-XkWh-138" value="&lt;b style=&quot;font-size: 15px&quot;&gt;Data Source file&lt;br&gt;&lt;span style=&quot;color: rgb(51 , 51 , 51) ; font-family: &amp;#34;helvetica neue&amp;#34; , &amp;#34;helvetica&amp;#34; , &amp;#34;arial&amp;#34; , sans-serif ; background-color: rgb(255 , 255 , 255)&quot;&gt;(Citi Bike NYC)&lt;/span&gt;&lt;/b&gt;" style="shape=datastore;whiteSpace=wrap;html=1;rounded=0;sketch=0;fillColor=#FFCCE6;" vertex="1" parent="1">
+          <mxGeometry x="380" y="210" width="137.5" height="130" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
