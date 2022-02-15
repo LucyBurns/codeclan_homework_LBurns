@@ -74,7 +74,7 @@ How do you interpret the r2 value reported by the model?
 
 The best fit found by R is:
 
-actual length = 1.1416 + 1.223 * estimated length
+actual length = 1.416 + 1.223 * estimated length
 
 We can see what the fitted values for the outcome variable (the actual length) that the model returns:
 
@@ -171,7 +171,7 @@ Identify by eye any points you think might be outliers and note their labels.
 Further split your outliers into those you think are 'influential' or 'non-influential' based on a visual assessment of their leverage.
 The main outlier is row 5 and possibly row 18.
 
-
+*Points 5 and 18 both look like outliers, and we might predict point 5 to be ‘influential’ as it has high leverage, and point 18 to be ‘non-influential’ given it has low leverage.*
 
 Use your model object from earlier and confirm your visual assessment of which points are 'influential' or 'non-influential' outliers based on Cook's distance.
 You can get a useful plot of Cook's distance by passing argument which = 4 to autoplot().
@@ -189,13 +189,81 @@ plot(lm(actual_length ~ estimated_length
         ,data=pro_man)) 
 ```
 
+
+```{r}
+autoplot(model, which = 4)
+```
+
+```{r}
+par(mfrow = c(2,2))
+plot(model)
+```
+*The Cook’s distance plot confirms that point 5 is an ‘influential’ outlier, as it lies above 1. In fact, this threshold is rather arbitrary, a better method is to look to see if any observation has a Cook’s distance substantially greater than the others. If so, examine that observation. So we would definitely want to look again at the data gathered and the estimation process for the job on row 5 to see if any errors were made.*
+
+Point 18 is an outlier, but is ‘non-influential’, as it has a Cook’s distance similar to the other points.
+
 Obtain the intercept and regression coefficient of variable estimated_length for a simple linear model fitted to data omitting one of your non-influential outlier points.
 How different are the intercept and coefficient from those obtained above by fitting the full data set?
+
+```{r}
+omit_18 <- pro_man %>%
+  slice(-18)
+
+omit_18_model <- lm(actual_length ~ estimated_length, data = omit_18)
+omit_18_model
+```
+
+*The intercepts differ by 0.175 in 1.416, i.e. by 12%. The coefficients differ by only 0.002 in 1.223, i.e. by 0.2%. These support classifying this point as ‘non-influential’.
+*
+
+
+
 Does this support classifying the omitted point as non-influential?
 Plot the data points, this regression line and the regression line for the full data set.
 How different are the lines?
 
+```{r}
+library(modelr)
+
+pro_man <- pro_man %>%
+  add_predictions(model, var = "full_model_pred") %>%
+  add_predictions(omit_18_model, var = "omit_18_model_pred")
+
+pro_man %>%
+  ggplot(aes(x = estimated_length)) +
+  geom_point(aes(y = actual_length)) +
+  geom_line(aes(y = full_model_pred), col = "red") +
+  geom_line(aes(y = omit_18_model_pred), col = "blue")
+```
+*The regression line lacking point 18 is slightly shifted upward, but it’s difficult to distinguish the two lines!*
+
+
 Repeat the procedure above, but this time omitting one of your influential outliers.
+
+```{r}
+omit_5 <- pro_man %>%
+  slice(-5)
+
+omit_5_model <- lm(actual_length ~ estimated_length, data = omit_5)
+omit_5_model
+```
+*The intercepts differ by 2.965 in 1.416, i.e. by 209%. The coefficients differ by 0.212 in 1.223, i.e. by 17%. Omitting this point leads to much larger differences in the regression parameters than the omission of point 18, and justify labelling point 5 as an influential outlier.*
+
+```{r}
+pro_man <- pro_man %>%
+  add_predictions(omit_5_model, var = "omit_5_model_pred")
+
+pro_man %>%
+  ggplot(aes(x = estimated_length)) +
+  geom_point(aes(y = actual_length)) +
+  geom_line(aes(y = full_model_pred), col = "red") +
+  geom_line(aes(y = omit_5_model_pred), col = "blue")
+```
+
+*The two regression lines differ significantly! It is clear how the presence of point 5 ‘drags’ the best fit line upward to steeper gradient.*
+
+
+
 3 Additional resources There are various techniques to perform what is known as 'robust regression' on a dataset.
 Robust methods are less affected by the presence of outliers.
 See the rlm() function ('robust linear model') in the MASS package and this blog post.
