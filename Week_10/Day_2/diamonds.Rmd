@@ -98,6 +98,17 @@ diamonds_trim <- diamonds %>%
 ggpairs(diamonds_trim)
 ```
 
+```{r}
+# Attempted to run just on a few variables with John's help - but it is not working yet
+par(mfrow = c(2, 3), mar = c(4,4,1,1))
+
+lapply(names(diamonds)[2:7], function(clm) {
+  plot(diamonds$price ~ diamonds[[clm]],
+       xlab = clm, ylab = 'Price')
+})
+```
+
+
 
 2.  Perform further `ggplot` visualisations of any significant
     correlations you find.
