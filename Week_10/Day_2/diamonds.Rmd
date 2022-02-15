@@ -1,0 +1,290 @@
+---
+title: "R Notebook"
+output: html_notebook
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r}
+library(tidyverse)
+library(GGally)
+library(ggfortify)
+library(janitor)
+library(fastDummies)
+library(mosaic)
+library(mosaicData)
+```
+
+
+
+# File information
+
+About this file
+
+A data frame with 53940 rows and 10 variables:
+
+price price in US dollars (\$326--\$18,823)
+
+carat weight of the diamond (0.2--5.01)
+
+cut quality of the cut (Fair, Good, Very Good, Premium, Ideal)
+
+colour diamond colour, from J (worst) to D (best)
+
+clarity a measurement of how clear the diamond is (I1 (worst), SI2, SI1,
+VS2, VS1, VVS2, VVS1, IF (best))
+
+x length in mm (0--10.74)
+
+y width in mm (0--58.9)
+
+z depth in mm (0--31.8)
+
+depth total depth percentage = z / mean(x, y) = 2 \* z / (x + y)
+(43--79)
+
+table width of top of diamond relative to widest point (43--95)
+
+# **1 MVP**
+
+1.  Load the `diamonds.csv` data set and undertake an initial
+    exploration of the data. You will find a description of the meanings
+    of the variables on the relevant [Kaggle
+    page](https://www.kaggle.com/shivam2503/diamonds/)
+
+```{r}
+diamonds <- read_csv("4_diamonds_hw/data/diamonds.csv")
+```
+
+```{r}
+diamonds <- clean_names(diamonds)
+
+head(diamonds)
+```
+```{r}
+summary(diamonds)
+```
+
+
+2.  We expect the `carat` of the diamonds to be strongly correlated with
+    the physical dimensions `x`, `y` and `z`. Use `ggpairs()` to
+    investigate correlations between these four variables.
+
+```{r}
+ggpairs(diamonds, columns = c("carat", "x", "y", "z"))
+```
+
+
+
+3.  So, we do find significant correlations. Let's drop columns `x`, `y`
+    and `z` from the dataset, in preparation to use only `carat` going
+    forward.
+
+```{r}
+diamonds_trim <- diamonds %>%
+  select(-c("x", "y", "z", "x1"))
+```
+
+4.  We are interested in developing a regression model for the `price`
+    of a diamond in terms of the possible predictor variables in the
+    dataset.
+    
+4.1.  Use `ggpairs()` to investigate correlations between `price` and the
+    predictors (this may take a while to run, don't worry, make coffee
+    or something).
+    
+    ```{r}
+ggpairs(diamonds_trim)
+```
+
+
+2.  Perform further `ggplot` visualisations of any significant
+    correlations you find.
+
+```{r}
+alias(lm(price ~ ., data = diamonds_trim))
+```
+
+```{r}
+diamonds_trim %>% 
+ggplot() +
+  geom_point((aes(y=carat, x=price, colour = clarity)))
+```
+
+```{r}
+diamonds_trim %>% 
+ggplot() +
+  geom_point((aes(y=table, x=price)))
+```
+```{r}
+diamonds_trim %>% 
+ggplot() +
+  geom_point((aes(y=depth, x=price)))
+```
+
+```{r}
+diamonds_trim %>% 
+ggplot() +
+  geom_point((aes(y=depth, x=table)))
+```
+```{r}
+diamonds_trim %>% 
+ggplot() +
+  geom_point((aes(y=carat, x=price)))
+```
+5.  Shortly we may try a regression fit using one or more of the
+    categorical predictors `cut`, `clarity` and `color`, so let's
+    investigate these predictors. Investigate the levels of these
+    predictors. How many dummy variables do you expect for each of them?
+    
+There will be one less dummy variables than there are categories:
+    
+Cut will produce (5-1) 4 dummy variables
+Clarity will produce (8-1) 7 dummy variables
+Colour will produce (7-1) 6 dummy variables
+
+```{r}
+diamonds_dummy_cut <- diamonds_trim %>%
+  fastDummies::dummy_cols(select_columns = "cut", 
+                          remove_first_dummy = TRUE, 
+                          remove_selected_columns = TRUE) 
+
+head(diamonds_dummy)
+```
+```{r}
+diamonds_dummy_clarity <- diamonds_trim %>%
+  fastDummies::dummy_cols(select_columns = "clarity", 
+                          remove_first_dummy = TRUE, 
+                          remove_selected_columns = TRUE) 
+
+head(diamonds_dummy_clarity)
+```
+```{r}
+diamonds_dummy_color <- diamonds_trim %>%
+  fastDummies::dummy_cols(select_columns = "color", 
+                          remove_first_dummy = TRUE, 
+                          remove_selected_columns = TRUE) 
+
+head(diamonds_dummy_color)
+```
+
+```{r}
+diamonds_trim %>% 
+  ggplot(aes(x = price)) +
+  geom_density() +
+  geom_vline(xintercept = mean(diamonds_trim$price),
+             size = 1,
+             colour = "purple") +
+  labs(title = "Raw Data")
+```
+
+```{r}
+price_mean <- mean(diamonds_trim$price)
+price_sd <- sd(diamonds_trim$price)
+
+diamonds_stand <- diamonds_trim %>% 
+  mutate(price_scaled = (price - price_mean) / price_sd)
+
+diamonds_stand
+```
+
+
+
+```{r}
+diamonds_stand %>% 
+  ggplot(aes(x = price_scaled)) +
+  geom_density() +
+  geom_vline(xintercept = mean(diamonds_stand$price_scaled), size = 1, colour = "red") +
+  labs(title = "Standardised data")
+```
+
+
+6.  Start with simple linear regression. Regress `price` on `carat` and
+    check the regression diagnostics.
+
+```{r}
+# carat is the DEPENDENT variable
+# it is described by price
+model <- lm(price ~ carat, diamonds_trim)
+summary(model)
+```
+
+```{r}
+diamonds_trim %>% 
+  ggplot(aes(x = carat, y = price)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+```
+```{r}
+autoplot(model)
+```
+```{r}
+diamonds_trim %>%
+  ggplot(aes(y = price)) + 
+  geom_boxplot()
+```
+
+
+7.  Add another predictor of your choice. Check your assumptions,
+    diagnostics, and interpret the model.
+
+
+```{r}
+diamonds_trim %>%
+  ggplot(aes(x = table, y = price)) + 
+  geom_boxplot()
+```
+
+```{r}
+diamonds_trim %>%
+  summarise(cor = cor(table, price))
+```
+
+```{r}
+model2 <- lm(price ~ carat + table, data = diamonds_trim)
+```
+
+```{r}
+autoplot(model)
+autoplot(model2) 
+```
+
+```{r}
+summary(model)
+summary(model2)
+```
+
+------------------------------------------------------------------------
+
+# **2 Extension**
+
+8.  Try adding an interaction between `log(carat)` and your chosen
+    categorical predictor. Do you think this interaction term is
+    statistically justified?
+
+```{r}
+diamonds_trim <- diamonds_trim %>% 
+  mutate(log_carat = log(carat))
+```
+
+```{r}
+# log_carat is the DEPENDENT variable
+# it is described by price
+model <- lm(price ~ log_carat, diamonds_trim)
+summary(model)
+```
+
+```{r}
+diamonds_trim %>% 
+  ggplot(aes(x = log_carat, y = price)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+```{r}
+autoplot(model)
+```
+
+9.  Find and plot an appropriate visualisation to show the effect of
+    this interaction
