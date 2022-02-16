@@ -292,6 +292,13 @@ summary(model)
 summary(model2)
 ```
 
+Using clarity for the second model (from answers)
+```{r}
+mod2_clarity <- lm(price ~ carat + clarity, data = diamonds_trim)
+summary(mod2_clarity)
+```
+Clarity leads to a model with highest r^2, all predictors are significant
+
 ------------------------------------------------------------------------
 
 # **2 Extension**
