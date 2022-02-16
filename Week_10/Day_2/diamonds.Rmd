@@ -82,6 +82,7 @@ ggpairs(diamonds, columns = c("carat", "x", "y", "z"))
     forward.
 
 ```{r}
+# Remove x, y, z and the row counter - x1
 diamonds_trim <- diamonds %>%
   select(-c("x", "y", "z", "x1"))
 ```
@@ -97,13 +98,15 @@ diamonds_trim <- diamonds %>%
     ```{r}
 ggpairs(diamonds_trim)
 ```
+It is a bit hard to see the correlations in the ggpairs() grid. There is definitely a good correlation between the price and the carat of the diamond.
+
 
 ```{r}
 # Attempted to run just on a few variables with John's help - but it is not working yet
 par(mfrow = c(2, 3), mar = c(4,4,1,1))
 
-lapply(names(diamonds)[2:7], function(clm) {
-  plot(diamonds$price ~ diamonds[[clm]],
+lapply(names(diamonds_trim)[1:6], function(clm) {
+  plot(diamonds_trim$price ~ diamonds_trim[[clm]],
        xlab = clm, ylab = 'Price')
 })
 ```
@@ -118,31 +121,54 @@ alias(lm(price ~ ., data = diamonds_trim))
 ```
 
 ```{r}
+# Looking at carat vs price = coloured by clarity
 diamonds_trim %>% 
 ggplot() +
-  geom_point((aes(y=carat, x=price, colour = clarity)))
+  geom_point((aes(y=carat, x=price, colour = clarity))) +
+  labs(
+    title = "Comparing Price and Carat",
+    subtitle = "(by clarity)\n"
+    ) 
+```
+
+
+
+```{r}
+diamonds_trim %>% 
+ggplot() +
+  geom_point((aes(y=table, x=price, colour = cut)))+
+  labs(
+    title = "Comparing Price and Table",
+    subtitle = "(by cut)\n"
+    ) 
+```
+```{r}
+diamonds_trim %>% 
+ggplot() +
+  geom_point((aes(y=depth, x=price, colour = cut))) +
+  labs(
+    title = "Comparing Price and Depth",
+    subtitle = "(by cut)\n"
+    ) 
 ```
 
 ```{r}
 diamonds_trim %>% 
 ggplot() +
-  geom_point((aes(y=table, x=price)))
+  geom_point((aes(y=depth, x=table, colour = cut))) +
+    labs(
+    title = "Comparing Depth and Table",
+    subtitle = "(by cut)\n"
+    ) 
 ```
 ```{r}
 diamonds_trim %>% 
 ggplot() +
-  geom_point((aes(y=depth, x=price)))
-```
-
-```{r}
-diamonds_trim %>% 
-ggplot() +
-  geom_point((aes(y=depth, x=table)))
-```
-```{r}
-diamonds_trim %>% 
-ggplot() +
-  geom_point((aes(y=carat, x=price)))
+  geom_point((aes(y=carat, x=price, colour = cut))) +
+    labs(
+    title = "Comparing Price and Carat",
+    subtitle = "(by cut)\n"
+    ) 
 ```
 5.  Shortly we may try a regression fit using one or more of the
     categorical predictors `cut`, `clarity` and `color`, so let's
@@ -299,3 +325,15 @@ autoplot(model)
 
 9.  Find and plot an appropriate visualisation to show the effect of
     this interaction
+
+```{r}
+diamonds_trim %>% 
+  ggplot(aes(x = price, y = log_carat)) +
+  geom_point(aes(x = price, y = log_carat, 
+                 colour = "steelblue")) +
+  geom_point(aes(x = price, y = carat, colour = "red")) +
+      labs(
+    title = "Comparing Log of Carat and Carat with Price",
+        y = "Carat or Log of Carat",
+    ) 
+```
