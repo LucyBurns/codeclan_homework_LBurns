@@ -1,0 +1,270 @@
+---
+title: "R Notebook"
+output: html_notebook
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r}
+library(tidyverse)
+library(modelr)
+library(GGally)
+library(ggfortify)
+```
+
+```{r}
+house_data <- read_csv("data/kc_house_data.csv")
+```
+
+# Question 1: Exploratory
+
+```{r}
+summary(house_data)
+```
+
+There are no missing values
+
+Columns to be removed: id date sqft_living15 sqft_lot15 zipcode
+
+Columns to be changed: waterfront yr_renovated - to renovated
+
+Considerations: condition - regrouped to 5 bands grade - left as is
+
+```{r}
+house_data <- house_data %>% 
+  mutate(renovated = ifelse(yr_renovated > 0, TRUE, FALSE ))
+```
+
+```{r}
+house_data <- house_data %>% 
+  mutate(waterfront = ifelse(waterfront > 0, TRUE, FALSE ))
+```
+
+```{r}
+house_data <- house_data %>% 
+  mutate(graded = case_when(grade >= 11 ~ 'high quality',
+                   grade >= 8 ~ 'above average',
+                   grade >= 7 ~ 'average',
+                   grade >= 4 ~ 'below average',
+                   TRUE ~ 'falls short'
+          ))
+```
+
+```{r}
+house_data %>% 
+  group_by(condition) %>% 
+  summarise(count = n())
+```
+
+```{r}
+house_data %>% 
+  group_by(grade) %>% 
+  summarise(count = n())
+```
+
+```{r}
+# Remove extra columns
+house_trim <- house_data %>% 
+  select(-c(renovated, id, date, sqft_living15, sqft_lot15, zipcode))
+```
+
+# Question 2
+
+Check for aliased variables using the alias() function (this takes in a
+formula object and a data set). \[Hint - formula price \~ . says 'price
+varying with all predictors', this is a suitable input to alias()\].
+Remove variables that lead to an alias. Check the 'Elements of multiple
+regression' lesson for a dropdown containing further information on
+finding aliased variables in a dataset.
+
+```{r}
+alias(lm(price ~ ., data = house_trim))
+```
+
+So sqft_basement is the same as sqft_living - sqft_above - so we can
+remove two of these
+
+```{r}
+# Remove extra columns
+house_trim <- house_trim %>% 
+  select(-c(sqft_living, sqft_basement))
+```
+
+# Question 3
+
+Systematically build a regression model containing up to four main
+effects (remember, a main effect is just a single predictor with
+coefficient), testing the regression diagnostics as you go * splitting
+datasets into numeric and non-numeric columns might help ggpairs() run
+in manageable time, although you will need to add either a price or
+resid column to the non-numeric dataframe in order to see its
+correlations with the non-numeric predictors.
+
+```{r}
+house_trim %>% 
+GGally::ggpairs()
+```
+Ooooft - that look a bit crazy
+
+```{r}
+houses_tidy_numeric <- house_trim %>%
+  select_if(is.numeric)
+
+houses_tidy_nonnumeric <- house_trim %>%
+  select_if(function(x) !is.numeric(x))
+
+houses_tidy_nonnumeric$price <- house_trim$price
+
+ggpairs(houses_tidy_numeric)
+ggpairs(houses_tidy_nonnumeric)
+```
+
+```{r}
+
+cor(houses_tidy_numeric) %>%
+  as_data_frame(rownames = "var1") %>%
+    pivot_longer(cols = -var1, names_to = "var2", values_to = "coeff") %>%
+    filter(var1 != var2) %>%
+    filter(var1 == "price") %>% 
+    arrange(desc(abs(coeff)))
+```
+
+Looking at all of the different combinations I think the variables I want to consider are:
+grade
+sqft_above
+bathrooms
+view
+waterfront
+
+## Building the model - first effect (comparing waterfront and grade)
+First I am going to try waterfront (the best fitting non-numeric variable) and grade (the best fitting numeric variable) and see how they compare
+
+```{r}
+mod1a <- lm(price ~ waterfront, data = house_trim)
+mod1a
+```
+
+```{r}
+mod1b <- lm(price ~ grade, data = house_trim)
+mod1b
+```
+
+Woah - so waterfront has a *huge* effect on price.
+
+For every $1 increase in price waterfront goes up 1.1 million with an intercept of $531564
+
+For grade the intercept starts much lower at -$1056045 and then goes up $208458
+
+So - let's start with waterfront
+
+```{r}
+summary(mod1a)
+```
+
+Hmm - the R-Squared value is low at only 7% of prices being affected by waterfront
+So perhaps it is a fantastic indication of price but is only found in a few properties.
+
+Lets have a quick look
+
+```{r}
+house_trim %>% 
+  group_by(waterfront) %>% 
+  summarise(count = n())
+```
+
+Only 163 of the properties are waterfront (0.75%) - so it is important for price - but overall has little impact on the rest of the sales
+
+```{r}
+par(mfrow = c(2,2))
+plot(mod1a)
+```
+
+We should definitely keep it in as a model predictor
+
+Now - have a better look at grade:
+
+```{r}
+mod1b <- lm(price ~ grade, data = house_trim)
+mod1b
+```
+
+```{r}
+summary(mod1b)
+```
+
+The Rsquared value is much higher: 44.55% of the prices are affected by grade and with a very small p-value this is also significant
+
+```{r}
+par(mfrow = c(2,2))
+plot(mod1b)
+```
+
+```{r}
+autoplot(mod1b)
+```
+
+## Adding in the second variable
+
+```{r}
+mod1a <- lm(price ~ waterfront, data = house_trim)
+mod1a
+```
+
+```{r}
+house_remaining_resid <- house_trim %>%
+  add_residuals(mod1a) %>%
+  select(-c("price", "waterfront"))
+house_remaining_resid
+```
+
+```{r}
+house_remaining_resid %>%
+GGally::ggpairs()
+```
+
+```{r}
+mod1d <- lm(resid ~ grade, data = house_remaining_resid)
+mod1d
+```
+
+Resid is our predicted value
+
+Resid = -1543405 + (201571 x grade)
+
+For every point increase in resid grade goes up by 201571
+
+```{r}
+summary(mod1d)
+```
+
+44.8% of property prices are affected by waterfront and grade
+
+```{r}
+par(mfrow = c(2,2))
+plot(mod1d)
+```
+
+## Adding the next one in
+
+```{r}
+mod2b <- lm(price ~ waterfront + grade + sqft_above, data = house_trim)
+summary(mod2b)
+```
+
+51% can now be predicted with waterfront, grade and sqft
+
+```{r}
+anova(mod2b, mod1d)
+```
+
+## Adding the last one 
+
+```{r}
+mod2c <- lm(price ~ waterfront + grade + sqft_above + bathrooms, data = house_trim)
+summary(mod2c)
+```
+
+51.6%
+
+
