@@ -235,10 +235,20 @@ Resid = -1543405 + (201571 x grade)
 For every point increase in resid grade goes up by 201571
 
 ```{r}
+#Re -running with correct column
+mod1da <- lm(resid ~ graded, data = house_remaining_resid)
+mod1da
+```
+
+
+```{r}
+# Comparing two versions of grade/graded
 summary(mod1d)
+summary(mod1da)
 ```
 
 44.8% of property prices are affected by waterfront and grade
+37.9% if it is split into categories - so keeping it as individual numbers is more efficient
 
 ```{r}
 par(mfrow = c(2,2))
@@ -264,6 +274,17 @@ anova(mod2b, mod1d)
 mod2c <- lm(price ~ waterfront + grade + sqft_above + bathrooms, data = house_trim)
 summary(mod2c)
 ```
+
+```{r}
+anova(mod2c, mod2b)
+```
+
+Final linear model:
+```{r}
+lm(formula = price ~ waterfront + grade + sqft_above + bathrooms, 
+    data = house_trim)
+```
+
 
 51.6%
 
