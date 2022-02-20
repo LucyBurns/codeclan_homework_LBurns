@@ -1,0 +1,60 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Homework Quiz
+
+## Question 1
+
+I want to predict how well 6 year-olds are going to do in their final school exams. Using the following variables am I likely under-fitting, fitting well or over-fitting? Postcode, gender, reading level, score in maths test, date of birth, family income.
+
+The question asks specifically about 6 year olds - so if the dataset is of 6 year olds then the date-of-birth is a meaningless variable.
+If, however, this is a larger dataset containing a range of ages then this variable will be useful.
+
+Okay - now I have read the question properly - you are using 6year old maths test scores to predict how someone will do in their final school exams? That's ridiculous! You have no way of knowing if a child is going to do well or not at school. Indicators that could determine that are postcode, current reading level, recent maths test score and family income - but it is still very early. You have no way of knowing if the child will move, change schools, suffer with problems, thrive - you just don't know! So I think this under-fitting and a longer term study will be more accurate.
+
+
+## Question 2
+If I have two models, one with an AIC score of 34,902 and the other with an AIC score of 33,559 which model should I use?
+
+For AIC models the lower the score, the better the resuly - so use the model with the score of 33,559.
+
+## Question 3
+I have two models, the first with: r-squared: 0.44, adjusted r-squared: 0.43. The second with: r-squared: 0.47, adjusted r-squared: 0.41. Which one should I use?
+
+The adjusted r-squared value is a better representation of the data and penalises you for adding variables which do not improve your existing model. So the better model is the first with an adjusted r-squared of 0.43.
+
+## Question 4
+I have a model with the following errors: RMSE error on test set: 10.3, RMSE error on training data: 10.4. Do you think this model is over-fitting?
+
+The RMSE is the root mean square error 
+
+The RMSE for the training and the test sets should be very similar if you have built a good model. If the RMSE for the test set is much higher than that of the training set, it is likely that you've badly over fit the data, i.e. you've created a model that tests well in sample, but has little predictive value when tested out of sample. The size of the RMSE is hard to determine its effectiveness. A better measure is the standardised RMSE which would give a score between 0 and 1 and is easier to determine.
+
+The normalised RMSE can be found by using:
+Normalised RMSE = RMSE / (max value – min value)
+
+In reality a better methodology would be to compare the RMSE of different models and accept the one with the lower score.
+
+We would expect the training set to have a higher RMSE than the test set as in this example. So - no I do not think this model is over-fitting.
+
+
+## Question 5
+How does k-fold validation work?
+
+A dataset is split into a number of equal subsets - let's say 10. Then each of the subsets is compared in turn to the remaining 9. This gives us an idea of how the data is behaving.
+
+For 5 subsets you would compare each of the 5 to the remaining 4 and so on
+
+## Question 6
+What is a validation set? When do you need one?
+When building a model you have data that you use to build the data and test data, usually split 80/20%. In complex model cases it is beneficial to have a third set - the validation set. It is used as a check once the model is complete. When building complex models the model can become over-fitted to the test data so the validation set allows another chance to test the effectiveness of the model.
+
+## Question 7
+Describe how backwards selection works.
+Backward selection begins with choosing all possible predictors (the full model). Each predictor is checked at each level and the one with the lowest effect on the r-squared value is removed.
+
+## Question 8
+Describe how best subset selection works.
+This is also known as exhaustive selection. Simply put, this modelling technique looks at every combination for every number of predictors. It can select the best possible comnbination. The big disadvantage of this is time/money - it takes a lot of time to process a model with a high number of variables and a large dataset.

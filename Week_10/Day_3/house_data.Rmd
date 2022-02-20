@@ -62,6 +62,20 @@ house_data %>%
   group_by(grade) %>% 
   summarise(count = n())
 ```
+```{r}
+# From homework answers
+# tidy up data. In particular treat condition and grade as factor, as they are
+# ordinal categorical
+houses_tidy <- houses %>%
+  select(-c("id", "date", "sqft_living15", "sqft_lot15", "zipcode")) %>%
+  mutate(waterfront = as.logical(waterfront)) %>%
+  mutate(renovated = yr_renovated != 0) %>%
+  select(-"yr_renovated") %>%
+  mutate(condition = as_factor(condition)) %>%
+  mutate(grade = as_factor(grade))
+
+glimpse(houses_tidy)
+```
 
 ```{r}
 # Remove extra columns
@@ -90,6 +104,18 @@ remove two of these
 house_trim <- house_trim %>% 
   select(-c(sqft_living, sqft_basement))
 ```
+
+```{r}
+# From homework answers
+# seems that sqft_basement can be computed from sqft_living - sqft_above.
+# let's drop sqft_living leaving just the two contributions sqft_basement and 
+# sqft_above
+houses_tidy <- houses_tidy %>%
+  select(-"sqft_living")
+
+glimpse(houses_tidy)
+```
+
 
 # Question 3
 

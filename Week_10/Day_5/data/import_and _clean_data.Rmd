@@ -1,0 +1,81 @@
+---
+title: "Import Data"
+output: html_notebook
+---
+## 3.1. Writing function/program to process data from an external file
+
+```{r}
+library(tidyverse)
+library(janitor)
+
+meteorite_data <- read.csv("data/meteorite_landings.csv")
+meteorite_data
+```
+
+## 3.4. Writing function/program to clean data
+
+```{r}
+# Import Libraries
+library(tidyverse)
+library(janitor)
+library(stringr)
+library(assertr)
+
+# Import data and pass into assertr
+meteorite_data <- read.csv("data/meteorite_landings.csv")
+  verify(meteorite_data, has_all_names ("id", "name", "mass..g.", "fall",
+         "year", "GeoLocation")) 
+
+# Clean names
+meteorite_landings <-  clean_names(meteorite_data)
+
+# Split the geo_location column into latitude and longitude and clean
+meteorite_landings <- meteorite_landings %>% 
+  separate(geo_location, c("latitude","longitude"), sep = ", ")
+
+# Remove the extra brackets in the code
+meteorite_landings <- meteorite_landings %>% 
+  mutate(latitude = str_remove(latitude, pattern = "[\\(]")) 
+meteorite_landings <- meteorite_landings %>% 
+  mutate(longitude = str_remove(longitude, pattern = "[\\)]")) 
+
+# Removing the NAs in the latitude/longitude columns and replacing with 0s
+meteorite_landings <- meteorite_landings %>% 
+  mutate(latitude = replace(latitude, is.na(latitude), 0))
+meteorite_landings <- meteorite_landings %>% 
+  mutate(longitude = replace(longitude, is.na(longitude), 0)) 
+
+# Changing latitude/longitude variables to numeric
+meteorite_landings <- meteorite_landings %>% 
+  mutate(latitude = as.numeric(latitude)) 
+meteorite_landings <- meteorite_landings %>% 
+  mutate(longitude = as.numeric(longitude)) 
+
+# Filtering latitude/longitude to remove outlying values
+meteorite_landings <- meteorite_landings %>% 
+  filter((latitude >= -90 & latitude <= 90)) 
+meteorite_landings <- meteorite_landings %>% 
+  filter((longitude >= -180 & longitude <= 180))
+
+# Check that the longitude/latitude values are now valid
+meteorite_landings <- meteorite_landings %>% 
+  verify(latitude >= -90 & latitude <= 90) 
+meteorite_landings <- meteorite_landings %>% 
+  verify(longitude >= -180 & longitude <= 180)
+
+# remove meteorites < 1000g
+meteorite_landings <- meteorite_landings %>% 
+  filter(mass_g >= 1000) 
+
+# arrange by year
+meteorite_landings <- meteorite_landings %>% 
+  arrange(year) 
+  
+# preview clean table
+meteorite_landings
+
+# export the data as a csv file
+write_csv(meteorite_landings, "data/clean_meteorite_landings.csv")
+
+```
+
