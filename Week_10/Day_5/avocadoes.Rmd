@@ -472,3 +472,50 @@ large bags -0.008
 xl bags -0.031
 year 0.139 - disregard this
 quarter - some variation - Do I need to make this a dummy?
+
+
+
+
+
+# Automated Approach (from homework answers)
+```{r}
+regsubsets_forward <- regsubsets(average_price ~ ., 
+                                 data = avocado_trim, 
+                                 nvmax = 12,
+                                 method = "forward")
+
+plot(regsubsets_forward)
+```
+
+```{r}
+# See what's in model
+plot(summary(regsubsets_forward)$bic, type = "b")
+```
+
+```{r}
+summary(regsubsets_forward)$which[8, ]
+```
+
+```{r}
+# test if we should put regions in
+mod_type_year <- lm(average_price ~ type + year, data = avocado_trim)
+mod_type_region <- lm(average_price ~ type + year + region, data = avocado_trim)
+anova(mod_type_year, mod_type_region)
+```
+
+```{r}
+# test if we should put year in
+mod_type_year <- lm(average_price ~ type + year, data = avocado_trim)
+mod_type_quarter <- lm(average_price ~ type + year + quarter, data = avocado_trim)
+anova(mod_type_year, mod_type_quarter)
+```
+
+```{r}
+# now let's test if the one with region and quarter is different than the one with just region
+
+mod_type_region_quarter <- lm(average_price ~ type + year + region + quarter, data = avocado_trim)
+anova(mod_type_region_quarter, mod_type_region)
+```
+
+
+

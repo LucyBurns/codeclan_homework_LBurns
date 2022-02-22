@@ -18,7 +18,7 @@ Okay - now I have read the question properly - you are using 6year old maths tes
 ## Question 2
 If I have two models, one with an AIC score of 34,902 and the other with an AIC score of 33,559 which model should I use?
 
-For AIC models the lower the score, the better the resuly - so use the model with the score of 33,559.
+For AIC models the lower the score, the better the result - so use the model with the score of 33,559.
 
 ## Question 3
 I have two models, the first with: r-squared: 0.44, adjusted r-squared: 0.43. The second with: r-squared: 0.47, adjusted r-squared: 0.41. Which one should I use?

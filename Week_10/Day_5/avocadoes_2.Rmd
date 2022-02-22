@@ -1,0 +1,416 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Watching Jamie build the model
+
+
+```{r}
+library(tidyverse)
+library(GGally)
+library(modelr)
+library(janitor)
+```
+
+```{r}
+avocados <- clean_names(read_csv("data/avocado.csv"))
+head(avocados)
+```
+
+# Prepare the data
+
+Ok, we have 14 variables. Can already see that some of them are somewhat useless (x1 for example). Not sure whether the total_bags variable is the sum of small_bags, large_bags and x_large_bags so I’ll check that first.
+
+```{r}
+# check to see if total_bags variable is just the sum of the other three
+avocados %>%
+  mutate(total_sum = small_bags + large_bags + x_large_bags) %>%
+  select(total_bags, total_sum)
+```
+
+Yep, the total_bags column is just a sum of the other three. So this is a another variable I can get rid of. I can also check the same for volume:
+
+```{r}
+# check to see if total_volume variable is just the sum of the other three
+avocados %>%
+  mutate(total_sum = x4046 + x4225 + x4770) %>%
+  select(total_volume, total_sum)
+```
+
+Nope, these aren’t the same, so we can keep all these in.
+
+
+
+Now let’s check how many different levels of each categorical variable we have.
+
+```{r}
+avocados %>%
+  distinct(region) %>%
+  summarise(number_of_regions = n())
+```
+
+```{r}
+avocados %>%
+  distinct(date) %>%
+  summarise(
+    number_of_dates = n(),
+    min_date = min(date),
+    max_date = max(date)
+  )
+```
+
+The region variable will lead to many categorical levels, but we can try leaving it in. We should also examine date and perhaps pull out from it whatever features we can. Including every single date would be too much, so we can extract the different parts of the date that might be useful. For example, we could try and split it into different quarters, or years.
+
+So, let’s do this now. Remove the variables we don’t need, change our categorical variables to factors, and extract parts of the date in case they are useful (and get rid of date).
+
+```{r}
+# Note the quarter and year are both factors and not numeric
+library(lubridate)
+trimmed_avocados <- avocados %>%
+  mutate(
+    quarter = as_factor(quarter(date)),
+    year = as_factor(year),
+    type = as_factor(type),
+    region = as_factor(region)
+  ) %>%
+  select(-c(x1, date,total_bags))
+```
+
+Now we’ve done our cleaning, we can check for aliased variables (i.e. combinations of variables in which one or more of the variables can be calculated exactly from other variables):
+
+```{r}
+alias(average_price ~ ., data = trimmed_avocados )
+```
+
+Nice, we don’t find any aliases. So we can keep going.
+
+# FirstVariable
+
+We need to decide on which variable we want to put in our model first. To do this, we should visualise it. Because we have so much data, ggpairs() might take a while to run, so we can split it up a bit.
+
+```{r}
+# let's start by plotting the volume variables
+trimmed_avocados %>%
+  select(average_price, total_volume, x4046, x4225, x4770) %>%
+  ggpairs() + 
+   theme_grey(base_size = 8) # font size of labels
+```
+
+Hmm, these look highly correlated with one another in some instances. This is a sign that we won’t have to include all of these in our model, so we could think about removing x4225 and x4770 from our dataset to give ourselves fewer variables.
+
+```{r}
+trimmed_avocados <- trimmed_avocados %>%
+  select(-x4225, -x4770)
+```
+
+In terms of variables that correlate well with average_price… well none of them do, that well. But that’s life. Our x046 variable is probably our first candidate.
+
+Next we can look at our volume variables.
+
+```{r}
+trimmed_avocados %>%
+  select(average_price, small_bags, large_bags, x_large_bags) %>%
+  ggpairs() + 
+   theme_grey(base_size = 8) # font size of labels
+```
+
+Hmm, again… not that promising. Some of the variables are highly correlated with one another, but not much seems highly correlated with average_price.
+
+
+
+We can look at some of our categorical variables next:
+
+```{r}
+trimmed_avocados %>%
+  select(average_price, type, year, quarter) %>%
+  ggpairs() + 
+   theme_grey(base_size = 8) # font size of labels
+```
+
+This seems better! Our type variable seems to show variation in the boxplots. This might suggest that conventional avocados and organic ones have different prices (which again, makes sense).
+
+Finally, we can make a boxplot of our region variable. Because this has so many levels, it makes sense to plot it by itself so we can see it.
+
+```{r}
+trimmed_avocados %>%
+  ggplot(aes(x = region, y = average_price)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+```
+
+Ok, seems there is some variation in the boxplots between different regions, so that seems like it could be promising.
+
+
+
+Let’s start by test competing models. We decided that x4046, type, and region seemed reasonable:
+
+```{r}
+library(ggfortify)
+
+# build the model 
+model1a <- lm(average_price ~ x4046, data = trimmed_avocados)
+
+# check the diagnostics
+autoplot(model1a)
+```
+
+```{r}
+# check the summary output
+summary(model1a)
+```
+
+```{r}
+# build the model 
+model1b <- lm(average_price ~ type, data = trimmed_avocados)
+
+# check the diagnostics
+autoplot(model1b)
+```
+
+```{r}
+# check the summary output
+summary(model1b)
+```
+
+```{r}
+# build the model 
+model1c <- lm(average_price ~ region, data = trimmed_avocados)
+
+# check the diagnostics
+autoplot(model1c)
+```
+
+```{r}
+# check the summary output
+summary(model1c)
+```
+
+model1b with type is best, so we’ll keep that and re-run ggpairs() with the residuals (again omitting region because it’s too big).
+
+# Second Variable
+
+```{r}
+avocados_remaining_resid <- trimmed_avocados %>%
+  add_residuals(model1b) %>%
+  select(-c("average_price", "type", "region"))
+
+ggpairs(avocados_remaining_resid) + 
+  theme_grey(base_size = 8) # this bit just changes the axis label font size so we can see
+```
+
+Again, this isn’t showing any really high correlations between the residuals and any of our numeric variables. Looks like x4046, year, quarter could show something potentially (given the rubbish variables we have).
+
+```{r}
+trimmed_avocados %>%
+  add_residuals(model1b) %>%
+  ggplot(aes(x = region, y = resid)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+```
+
+Looks like region are our next contenders to try. Let’s do these now.
+
+```{r}
+model2a <- lm(average_price ~ type + x4046, data = trimmed_avocados)
+autoplot(model2a)
+```
+
+```{r}
+summary(model2a)
+```
+
+```{r}
+model2b <- lm(average_price ~ type + year, data = trimmed_avocados)
+autoplot(model2b)
+```
+
+```{r}
+summary(model2b)
+```
+
+```{r}
+model2c <- lm(average_price ~ type + quarter, data = trimmed_avocados)
+autoplot(model2c)
+```
+
+```{r}
+summary(model2c)
+```
+
+```{r}
+model2d <- lm(average_price ~ type + region, data = trimmed_avocados)
+autoplot(model2d)
+```
+
+```{r}
+summary(model2d)
+```
+
+So model2d with type and region comes out as better here. We have some region coefficients that are not significant at 0.05 level, so let’s run an anova() to test whether to include region
+
+```{r}
+# model1b is the model with average_price ~ type
+# model2d is the model with average_price ~ type + region
+
+# we want to compare the two
+anova(model1b, model2d)
+```
+
+It seems region is significant overall, so we’ll keep it in!
+
+# Third Variable
+
+Model2d is our model with average_price ~ type + region, and it explains 0.5473 of the variance in average price. This isn’t really very high, so we can think about adding a third predictor now. Again, we want to remove these variables from our data, and check the residuals.
+
+```{r}
+avocados_remaining_resid <- trimmed_avocados %>%
+  add_residuals(model2d) %>%
+  select(-c("average_price", "type", "region"))
+
+ggpairs(avocados_remaining_resid) + 
+   theme_grey(base_size = 8) # font size of labels
+```
+
+The next contender variables look to be x_large_bags, year and quarter. Let’s try them out.
+
+```{r}
+model3a <- lm(average_price ~ type + region + x_large_bags, data = trimmed_avocados)
+autoplot(model3a)
+```
+
+```{r}
+summary(model3a)
+```
+
+```{r}
+model3b <- lm(average_price ~ type + region + year, data = trimmed_avocados)
+autoplot(model3b)
+```
+
+```{r}
+summary(model3b)
+```
+
+```{r}
+model3c <- lm(average_price ~ type + region + quarter, data = trimmed_avocados)
+autoplot(model3c)
+```
+
+```{r}
+summary(model3c)
+```
+
+So model3c with type, region and quarter wins out here. Everything still looks reasonable with the diagnostics, perhaps some mild heteroscedasticity.
+
+# Fourth Variable
+
+Remember with two predictors, our R^2 variable was up at 0.5473. Now, with three predictors, we are at 0.5874. Ok, that seems reasonable as an improvement. So let’s see how much improvement we get by adding a fourth variable. Again, check the residuals to see which ones we should try add.
+
+```{r}
+avocados_remaining_resid <- trimmed_avocados %>%
+  add_residuals(model3c) %>%
+  select(-c("average_price", "type", "region", "quarter"))
+
+ggpairs(avocados_remaining_resid) + 
+   theme_grey(base_size = 8) # font size of labels
+```
+
+The contender variables here are x_large_bags and year, so let’s try them out.
+
+```{r}
+model4a <- lm(average_price ~ type + region + quarter + x_large_bags, data = trimmed_avocados)
+autoplot(model4a)
+```
+
+```{r}
+summary(model4a)
+```
+
+```{r}
+model4b <- lm(average_price ~ type + region + quarter + year, data = trimmed_avocados)
+autoplot(model4b)
+```
+
+```{r}
+summary(model4b)
+```
+
+Hmm, model4b with type, region, quarter and year wins here. And it has improved our model performance from 0.5874 (with three predictors) to 0.6213. That’s quite good.
+
+# Fifth Variable
+
+We are likely now pursuing variables with rather limited explanatory power, but let’s check for one more main effect, and see how much predictive power it gives us.
+
+```{r}
+avocados_remaining_resid <- trimmed_avocados %>%
+  add_residuals(model4b) %>%
+  select(-c("average_price", "type", "region", "quarter", "year"))
+
+ggpairs(avocados_remaining_resid) + 
+   theme_grey(base_size = 8) # font size of labels
+```
+
+It looks like x_large_bags is the remaining contender, let’s check it out!
+
+```{r}
+model5 <- lm(average_price ~ type + region + quarter + year + x_large_bags, data = trimmed_avocados)
+autoplot(model5)
+```
+
+```{r}
+summary(model5)
+```
+
+Overall, we still have some heterscedasticity and deviations from normality in the residuals. In terms of our regression summary, it is a significant explanatory variable, and it is significant. But hmmm… with four predictors, our overall R^2 was 0.6213, and now with five we’ve only reached 0.6214. Given that there is no real increase in explanatory performance, even though it’s significant, we might want to remove it. Let’s do this now.
+
+It’s also clear we aren’t gaining anything by adding predictors. The final thing we can do is test for interactions.
+
+# Pair interaction
+
+Let’s now think about possible pair interactions: for four main effect variables (type + region + quarter + year), so we have six possible pair interactions. Let’s test them out.
+
+type:region
+type:quarter
+type:year
+region:quarter
+region:year
+quarter:year
+Let’s test these now:
+
+```{r}
+model5pa <- lm(average_price ~ type + region + quarter + year + type:region, data = trimmed_avocados)
+summary(model5pa)
+```
+
+```{r}
+model5pb <- lm(average_price ~ type + region + quarter + year + type:quarter, data = trimmed_avocados)
+summary(model5pb)
+```
+
+```{r}
+model5pc <- lm(average_price ~ type + region + quarter + year + type:year, data = trimmed_avocados)
+summary(model5pc)
+```
+
+```{r}
+model5pd <- lm(average_price ~ type + region + quarter + year + region:quarter, data = trimmed_avocados)
+summary(model5pd)
+```
+
+```{r}
+model5pe <- lm(average_price ~ type + region + quarter + year + region:year, data = trimmed_avocados)
+summary(model5pe)
+```
+
+```{r}
+model5pf <- lm(average_price ~ type + region + quarter + year + quarter:year, data = trimmed_avocados)
+summary(model5pf)
+```
+
+So it looks like model5pa with the type, region, quarter, year, and type:region is the best, with a moderate gain in multiple-r2 due to the interaction. However, we need to test for the significance of the interaction given the various p-values of the associated coefficients
+
+Neat, it looks like including the interaction is statistically justified. So we can keep it in. And our final model is:
+
+    average_price ~ type + region + quarter + year + type:region
+
