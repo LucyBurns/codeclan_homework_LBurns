@@ -156,7 +156,32 @@ Looks like 6 is the optimum number of clusters
 
 The clusters are very clear to see on annual income vs spending score - and even suggest that 5 clusters might be more preferable. For the two graphs comparing age as well the clusters are less distinct - so perhaps age could be left out of the model.
 
-Copies of the clustered graphs:
+Comment on the segments - changed to 5:
+
+```{r}
+ clusterings %>% 
+  unnest(cols = c(augmented)) %>%
+  filter(k <= 5) %>%
+  ggplot(aes(x = spending_score_1_100, y = annual_income_k)) +
+  geom_point(aes(color = .cluster))
+```
+
+```{}
+```
+
+Changing to 5 clusters:
+
+Cluster 1 - low income, low spending score
+
+Cluster 2 - high income, high spending score
+
+Cluster 3 - low income, high spending score
+
+Cluster 4 - high income, low spending score
+
+Cluster 5 - middle income, middle spending score
+
+Copies of the clustered graphs (for reference):
 
 ![](images/paste-0D9EEA0C.png)
 
