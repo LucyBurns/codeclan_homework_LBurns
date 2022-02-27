@@ -1,0 +1,309 @@
+---
+title: "Text Mining Homework"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+    css: ../../../styles.css
+  pdf_document: default
+---
+
+# MVP
+
+Using the dataset `austen_books()` from the package `janeaustenr`:
+
+1.  Find the most common words in both Pride & Prejudice and Sense & Sensibility.
+2.  Find the most common words in both Pride & Prejudice and Sense & Sensibility, not including stop words.
+3.  Find the most common sentiment words in both Pride & Prejudice and Sense & Sensibility.
+
+# Extension
+
+Taking your results above. Can you create a plot which visualises the differences between the books?
+
+```{r}
+library(tidyverse)
+library(tidytext) # Julia Silge
+library(janeaustenr)
+library(textdata)
+library(ggwordcloud)
+library(wordcloud)
+library(wordcloud2)
+library(RColorBrewer)
+library(janitor)
+```
+
+```{r}
+# Import the data set for all books
+all_books <- austen_books()
+```
+
+```{r}
+# Check the names of the books in the main table
+all_books %>% 
+  group_by(book) %>% 
+  summarise(count = n())
+```
+
+# 1.  Find the most common words in both Pride & Prejudice and Sense & Sensibility.
+
+```{r}
+# Top words in Pride and Prejudice
+pride_top_all <- all_books %>%
+  filter(book == "Pride & Prejudice") %>%
+  unnest_tokens(word, text) %>%
+  count(word, sort = TRUE) 
+pride_top_all
+```
+
+```{r}
+# Top words in Sense and Sensibility
+sense_top_all <- all_books %>%
+  filter(book == "Sense & Sensibility") %>%
+  unnest_tokens(word, text) %>%
+  count(word, sort = TRUE) 
+sense_top_all
+```
+
+# 2.  Find the most common words in both Pride & Prejudice and Sense & Sensibility, not including stop words.
+
+Filter the required books and remove stop words
+
+```{r}
+# Top words in Pride and Prejudice
+pride <- all_books %>%
+  filter(book == "Pride & Prejudice") %>%
+  unnest_tokens(word, text) %>%
+  count(word, sort = TRUE) %>%
+  anti_join(stop_words)
+pride
+```
+
+```{r}
+# Top words in Sense and Sensibility
+sense <- all_books %>%
+  filter(book == "Sense & Sensibility") %>%
+  unnest_tokens(word, text) %>%
+  count(word, sort = TRUE) %>%
+  anti_join(stop_words)
+sense
+```
+
+```{r}
+wordcloud2(data=pride)
+```
+
+```{r}
+wordcloud2(data=sense)
+```
+
+# 3.  Find the most common sentiment words in both Pride & Prejudice and Sense & Sensibility.
+
+```{r}
+# For some reason this code which I found in github creates the tables in a useable format
+all_books2 <- austen_books() %>%     
+  group_by(book) %>%
+  mutate(linenumber = row_number(),
+         chapter = cumsum(str_detect(text, regex("^chapter [\\divxlc]", 
+                                                 ignore_case = TRUE)))) %>%
+  ungroup() %>%
+  unnest_tokens(word, text)
+```
+
+```{r}
+# Import sentiment libraries
+afinn <- get_sentiments("afinn")
+bing <- get_sentiments("bing")
+loughran <- get_sentiments("loughran")
+nrc <- get_sentiments("nrc")
+```
+
+```{r}
+# Remind myself of the sentiments in each one
+bing %>% 
+  group_by(sentiment) %>% 
+  summarise(count = n())
+
+loughran %>% 
+  group_by(sentiment) %>% 
+  summarise(count = n())
+
+nrc %>% 
+  group_by(sentiment) %>% 
+  summarise(count = n())
+```
+
+All books - positive and negative
+
+```{r}
+all_books2 %>%
+  inner_join(get_sentiments("bing")) %>%
+  count(word, sentiment, sort = TRUE) %>%
+  acast(word ~ sentiment, value.var = "n", fill = 0) %>%
+  comparison.cloud(random.order = FALSE, colors = c("dark blue", "firebrick1"),
+                   max.words = 120)
+```
+
+```{r}
+all_books2 %>%
+  filter(book == "Pride & Prejudice") %>% 
+  inner_join(get_sentiments("bing")) %>%
+  count(word, sentiment, sort = TRUE) %>%
+  acast(word ~ sentiment, value.var = "n", fill = 0) %>%
+  comparison.cloud(random.order = FALSE, colors = c("dark blue", "light blue"),
+                   max.words = 120)
+
+all_books2 %>%
+  filter(book == "Sense & Sensibility") %>% 
+  inner_join(get_sentiments("bing")) %>%
+  count(word, sentiment, sort = TRUE) %>%
+  acast(word ~ sentiment, value.var = "n", fill = 0) %>%
+  comparison.cloud(random.order = FALSE, colors = c("blueviolet", "cyan"),
+                   max.words = 120)
+
+all_books2 %>%
+  filter(book == "Mansfield Park") %>% 
+  inner_join(get_sentiments("bing")) %>%
+  count(word, sentiment, sort = TRUE) %>%
+  acast(word ~ sentiment, value.var = "n", fill = 0) %>%
+  comparison.cloud(random.order = FALSE, colors = c("darkorchid", "deeppink"),
+                   max.words = 120)
+
+all_books2 %>%
+  filter(book == "Persuasion") %>% 
+  inner_join(get_sentiments("bing")) %>%
+  count(word, sentiment, sort = TRUE) %>%
+  acast(word ~ sentiment, value.var = "n", fill = 0) %>%
+  comparison.cloud(random.order = FALSE, colors = c("deepskyblue4", "deepskyblue"),
+                   max.words = 120)
+
+all_books2 %>%
+  filter(book == "Northanger Abbey") %>% 
+  inner_join(get_sentiments("bing")) %>%
+  count(word, sentiment, sort = TRUE) %>%
+  acast(word ~ sentiment, value.var = "n", fill = 0) %>%
+  comparison.cloud(random.order = FALSE, colors = c("chocolate1", "coral1"),
+                   max.words = 120)
+
+all_books2 %>%
+  filter(book == "Emma") %>% 
+  inner_join(get_sentiments("bing")) %>%
+  count(word, sentiment, sort = TRUE) %>%
+  acast(word ~ sentiment, value.var = "n", fill = 0) %>%
+  comparison.cloud(random.order = FALSE, colors = c("forestgreen", "darkolivegreen1"),
+                   max.words = 120)
+```
+
+
+
+I am going to use the nrc database for individual books:
+
+
+```{r}
+pride_sentiments <- all_books2 %>% 
+  filter(book == "Pride & Prejudice") %>% 
+  inner_join(nrc)
+
+pride_sentiments %>% 
+  filter(sentiment == "positive") %>% 
+  count(word, sort = TRUE)
+```
+
+
+
+
+```{r}
+# Positive codes from sense and sensibility
+sense_sentiments <- all_books2 %>% 
+  filter(book == "Sense & Sensibility") %>% 
+  inner_join(nrc)
+
+sense_sentiments %>% 
+  filter(sentiment == "positive") %>% 
+  count(word, sort = TRUE)
+```
+
+```{r}
+pride_sentiment_summary <- pride_sentiments %>% 
+# filter(sentiment == "positive") %>% 
+  group_by(sentiment) %>% 
+  count(word, sort = TRUE)
+
+sense_sentiment_summary <- sense_sentiments %>% 
+# filter(sentiment == "positive") %>% 
+  group_by(sentiment) %>% 
+  count(word, sort = TRUE)
+```
+
+```{r}
+# Top 5 sentiments for each of the 10 sentiment values - P&P
+pride_top_sentiments <- pride_sentiment_summary %>%
+  arrange_(~ desc(n)) %>%
+  group_by_(~ sentiment) %>%
+  slice(1:5)
+pride_top_sentiments
+```
+
+```{r}
+# Top 5 sentiments for each of the 10 sentiment values - S&S
+sense_top_sentiments <- sense_sentiment_summary %>%
+  arrange_(~ desc(n)) %>%
+  group_by_(~ sentiment) %>%
+  slice(1:5)
+sense_top_sentiments
+```
+
+# Story Arcs
+
+```{r}
+afinn_pride_sentiments <- pride %>%
+  inner_join(afinn)
+```
+
+```{r}
+# Looking at the story arcs
+# Not sure what is going on with Persuasion though!
+all_books %>%
+  filter(book %in% c("Sense & Sensibility", "Pride & Prejudice", "Mansfield Park", 
+                     "Persuasion", "Northanger Abbey", "Emma")) %>%
+  unnest_tokens(word, text) %>%
+  inner_join(get_sentiments("afinn")) %>%
+  group_by(book) %>%
+  mutate(
+    word_n = row_number()
+  ) %>%
+  mutate(
+    story_position = word_n/max(word_n) 
+  ) %>% 
+ggplot +
+  aes(x = story_position, y = value, colour = book) +
+  geom_smooth(se = FALSE) +
+  guides(colour = FALSE) +
+  facet_wrap(~ book, nrow = 3)
+```
+
+
+```{r}
+# Looking at the story arcs
+# Not sure what is going on with Persuasion though!
+all_books2 %>%
+  filter(book %in% c("Sense & Sensibility", "Pride & Prejudice", "Mansfield Park", 
+                     "Persuasion", "Northanger Abbey", "Emma")) %>%
+  #unnest_tokens(word, text) %>%
+  inner_join(get_sentiments("afinn")) %>%
+  group_by(book) %>%
+  mutate(
+    word_n = row_number()
+  ) %>%
+  mutate(
+    story_position = word_n/max(word_n) 
+  ) %>% 
+ggplot +
+  aes(x = story_position, y = value, colour = book) +
+  geom_smooth(se = FALSE) +
+  guides(colour = FALSE) +
+  facet_wrap(~ book, nrow = 3)
+```
+
+
