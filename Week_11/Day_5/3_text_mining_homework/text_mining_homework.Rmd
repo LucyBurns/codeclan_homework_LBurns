@@ -306,4 +306,23 @@ ggplot +
   facet_wrap(~ book, nrow = 3)
 ```
 
-
+```{r}
+# Looking at the story arcs
+# Not sure what is going on with Persuasion though!
+all_books2 %>%
+  filter(book %in% c("Persuasion")) %>%
+  #unnest_tokens(word, text) %>%
+  inner_join(get_sentiments("afinn")) %>%
+  group_by(book) %>%
+  mutate(
+    word_n = row_number()
+  ) %>%
+  mutate(
+    story_position = word_n/max(word_n) 
+  ) %>% 
+ggplot +
+  aes(x = story_position, y = value, colour = book) +
+  geom_smooth(se = FALSE) +
+  guides(colour = FALSE) 
+ # facet_wrap(~ book, nrow = 3)
+```

@@ -10,11 +10,6 @@ output:
   pdf_document: default
 ---
 
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(fig.align = "center")
-```
-
 # MVP
 
 You have been provided with a set of data on customer purchases of either 'Citrus Hill' (`purchase = 'CH'`) or 'Minute Maid' (`purchase = 'MM'`) orange juice, together with some further attributes of both the customer and the store of purchase. A data dictionary is also provided in the `data` directory.
@@ -23,19 +18,19 @@ We would like you to build the best **predictive classifier** you can of whether
 
 **Issues we faced, thoughts we had**
 
-* This is quite a tough, open-ended exercise. We decided early on to use an automated approach to model selection using `glmulti()`, but feel free to use a manual approach if you prefer!
-* The `Purchase` dependent variable will require wrangling to work in logistic regression. We replaced it with a `purchase_mm` logical variable.
-* Wrangle other categorical variables to be factors too.
-* `WeekOfPurchase` is also quite tough to deal with: should it be added as a factor variable (it will lead to many coefficients), left as numeric, or omitted entirely? See if you can come up with a strategy to decide what to do with it.
-* Check for aliased variables and remove any aliases before you set off to find your best models. Remember, you can use something like `alias(purchase_mm ~ ., data = oj)` to do this, the dot `.` here means 'all variables'. Aliased variables will be listed down the left-hand side, and you can subsequently remove them.
+-   This is quite a tough, open-ended exercise. We decided early on to use an automated approach to model selection using `glmulti()`, but feel free to use a manual approach if you prefer!
+-   The `Purchase` dependent variable will require wrangling to work in logistic regression. We replaced it with a `purchase_mm` logical variable.
+-   Wrangle other categorical variables to be factors too.
+-   `WeekOfPurchase` is also quite tough to deal with: should it be added as a factor variable (it will lead to many coefficients), left as numeric, or omitted entirely? See if you can come up with a strategy to decide what to do with it.
+-   Check for aliased variables and remove any aliases before you set off to find your best models. Remember, you can use something like `alias(purchase_mm ~ ., data = oj)` to do this, the dot `.` here means 'all variables'. Aliased variables will be listed down the left-hand side, and you can subsequently remove them.
 
 **`glmulti()` hints**
 
-If you decide to use `glmulti()` be prepared for your `R` session to hang if you decide to abort a run! The reason for this is that `glmulti()` actually uses a separate Java runtime to do its thing in the background, and unfortunately `R` can't instruct Java to terminate on request. D'oh! Accordingly, make sure you **save any changes** to your work **before** each `glmulti()` run. That way, you can force quit `RStudio` if necessary without losing work. 
+If you decide to use `glmulti()` be prepared for your `R` session to hang if you decide to abort a run! The reason for this is that `glmulti()` actually uses a separate Java runtime to do its thing in the background, and unfortunately `R` can't instruct Java to terminate on request. D'oh! Accordingly, make sure you **save any changes** to your work **before** each `glmulti()` run. That way, you can force quit `RStudio` if necessary without losing work.
 
 Here are some example inputs for using `glmulti()` with logistic regression for a variety of purposes.
 
-* Run an exhaustive search (i.e. all possible models) over all 'main effects only' logistic regression models using BIC as the quality metric
+-   Run an exhaustive search (i.e. all possible models) over all 'main effects only' logistic regression models using BIC as the quality metric
 
 ```{r, eval=FALSE}
 glmulti_search_all_mains <- glmulti(
@@ -53,7 +48,7 @@ glmulti_search_all_mains <- glmulti(
 summary(glmulti_search_all_mains)
 ```
 
-* Imagine now you've found the main effects model with lowest BIC, and you would like to add on a single pair interaction considering only main effects in the model. Which single pair addition leads to lowest BIC?
+-   Imagine now you've found the main effects model with lowest BIC, and you would like to add on a single pair interaction considering only main effects in the model. Which single pair addition leads to lowest BIC?
 
 ```{r, eval=FALSE}
 glmulti_search_previous_mains_one_pair <- glmulti(
@@ -74,7 +69,7 @@ glmulti_search_previous_mains_one_pair <- glmulti(
 summary(glmulti_search_previous_mains_one_pair)
 ```
 
-* In cases where an exhaustive search isn't possible because there are too many possible models to search through, you could try a search using a genetic algorithm. Here, run a genetic algorithm search over all main effects plus pair models, using lowest AIC as the quality criterion
+-   In cases where an exhaustive search isn't possible because there are too many possible models to search through, you could try a search using a genetic algorithm. Here, run a genetic algorithm search over all main effects plus pair models, using lowest AIC as the quality criterion
 
 ```{r, eval=FALSE}
 glmulti_ga_search_with_pairs_aic <- glmulti(
@@ -93,4 +88,180 @@ glmulti_ga_search_with_pairs_aic <- glmulti(
 summary(glmulti_ga_search_with_pairs_aic)
 ```
 
+# Import Data and Libraries
+
+```{r}
+library(tidyverse)
+library(glmulti)
+library(caret)
+library(janitor)
+library(lubridate)
+library(GGally)
+```
+
+```{r}
+read_csv("data/data_dict.txt")
+```
+
+```{r}
+oj_file <- read_csv("data/orange_juice.csv")
+```
+
+```{r}
+glimpse(oj_file)
+```
+
+There are 18 variables - all of them are numeric except: Purchase - character (Levels CH and MM indicating whether the customer purchased Citrus Hill or Minute Maid Orange Juice) Store7 - 
+character (Store7 - A factor with levels No and Yes indicating whether the sale is at Store 7)
+
+Run the file through janitor to clean the names
+```{r}
+oj_file <- oj_file %>% 
+  clean_names()
+```
+
+Check for NAs
+
+```{r}
+summary(oj_file)
+```
+
+# Data Manipulation
+
+The predictor column is purchase and at the moment it contains CH or MM. It has been suggested that this should be replaced with a logical variable
+We can also change the week of purchase to a date field and the store ID to a factor
+
+```{r}
+oj_tidy <- oj_file %>% 
+    mutate(purchase_mm = ifelse("purchase" == "MM", TRUE, FALSE), .before = 1) %>%
+    mutate(weekof_purchase = as_date(weekof_purchase)) %>% 
+    mutate(special_ch = as.logical(special_ch),
+          special_mm = as.logical(special_mm)) %>% 
+    mutate(store_id = as.factor(store_id)) %>% 
+    select(-c("purchase"))
+glimpse(oj_tidy)
+```
+
+Okay - now let's use alias to look at the nature of the variables and see if we can remove some
+
+```{r}
+alias(purchase_mm ~ ., data = oj_tidy)
+```
+
+It looks like we have a couple of unnecessary columns
+
+Let's remove the store7 and the store columns - as this can be calculated from the store_id factor column. 
+
+```{r}
+oj_tidy <- oj_tidy %>% 
+    select(-c("store", "store7"))
+glimpse(oj_tidy)
+```
+
+Run alias again:
+```{r}
+alias(purchase_mm ~ ., data = oj_tidy)
+```
+
+We are getting there - but there are some duplicates in the price fields
+sale_price_mm = price_mm - disc_mm
+sale_price_ch = price_ch - price_ch
+price_diff = combination of the prices
+list_price_diff = price_mm - price_ch
+
+Let's try keeping
+  sale_price_mm
+  sale_price_ch
+  price_diff
+  
+```{r}
+oj_tidy <- oj_tidy %>% 
+    select(-c("list_price_diff", "price_ch", "price_mm", "disc_ch", "disc_mm"))
+glimpse(oj_tidy)
+```
+
+Run alias again:
+```{r}
+alias(purchase_mm ~ ., data = oj_tidy)
+```
+
+One last alias:
+  price_diff = sale_price_mm - sale_price_ch
+  
+So let's just keep price_diff
+
+```{r}
+oj_tidy <- oj_tidy %>% 
+    select(-c("sale_price_mm", "sale_price_ch"))
+glimpse(oj_tidy)
+```
+
+Run alias again:
+```{r}
+alias(purchase_mm ~ ., data = oj_tidy)
+```
+
+Okay - no more alias issues - we can move on to splitting the data.
+
+```{r}
+# Quick look at ggpairs()
+ggpairs(oj_tidy)
+```
+
+```{r}
+# Look at the week of purchase data
+oj_tidy %>%
+  group_by(weekof_purchase) %>%
+  summarise(n = n())
+```
+
+```{r}
+# Plot week of purchase data
+oj_tidy %>%
+  ggplot(aes(x = weekof_purchase, fill = purchase_mm)) +
+  geom_bar() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+```
+
+
+# Train-Test Splitting
+
+Let's use caret to perform train-test splitting. The createDataPartition() function has the nice feature that it takes in a y= argument specifying outcomes, and it will try to ensure similar distributions of those outcomes in train and test sets.
+
+```{r}
+# This will give us an 80/20 split between train and test
+# Count rows
+n_data <- nrow(oj_tidy)
+
+test_index <- sample(1:n_data, size = n_data * 0.2)
+
+test  <- slice(oj_tidy, test_index)
+train <- slice(oj_tidy, -test_index)
+```
+
+The train set has 856 rows (80.0%)
+The test set has 214 rows (20.0%)
+
+# Start with glmulti
+
+
+This keeps throwing an error and I can't work out why
+Error in str2lang(s) : parsing result not of length one, but 0
+In addition: There were 50 or more warnings (use warnings() to see the first 50)
+
+```{r}
+glmulti_search_all_mains <- glmulti(
+  purchase_mm ~ ., 
+  data = train,
+  level = 1,               # No interactions considered, main effects only
+  method = "h",            # Exhaustive approach
+  crit = "bic",            # BIC as criteria
+  confsetsize = 10,        # Keep 10 best models
+  plotty = F, 
+  report = T,              # No plots, but provide interim reports
+  fitfunction = "glm",     # glm function
+  family = binomial(link = "logit")) # binomial family for logistic regression
+
+summary(glmulti_search_all_mains)
+```
 
