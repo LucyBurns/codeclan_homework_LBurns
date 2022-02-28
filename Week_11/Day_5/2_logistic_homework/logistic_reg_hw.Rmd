@@ -133,7 +133,7 @@ We can also change the week of purchase to a date field and the store ID to a fa
 
 ```{r}
 oj_tidy <- oj_file %>% 
-    mutate(purchase_mm = ifelse("purchase" == "MM", TRUE, FALSE), .before = 1) %>%
+   mutate(purchase_mm = (purchase == "MM"),, .before = 1) %>%
     mutate(weekof_purchase = as_date(weekof_purchase)) %>% 
     mutate(special_ch = as.logical(special_ch),
           special_mm = as.logical(special_mm)) %>% 
@@ -242,12 +242,17 @@ train <- slice(oj_tidy, -test_index)
 The train set has 856 rows (80.0%)
 The test set has 214 rows (20.0%)
 
+```{r}
+train %>%
+  tabyl(purchase_mm)
+```
+
+```{r}
+test %>%
+  tabyl(purchase_mm)
+```
+
 # Start with glmulti
-
-
-This keeps throwing an error and I can't work out why
-Error in str2lang(s) : parsing result not of length one, but 0
-In addition: There were 50 or more warnings (use warnings() to see the first 50)
 
 ```{r}
 glmulti_search_all_mains <- glmulti(

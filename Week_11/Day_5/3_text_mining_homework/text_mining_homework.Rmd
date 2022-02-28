@@ -32,6 +32,7 @@ library(wordcloud)
 library(wordcloud2)
 library(RColorBrewer)
 library(janitor)
+library(reshape2)
 ```
 
 ```{r}
@@ -191,7 +192,7 @@ all_books2 %>%
   inner_join(get_sentiments("bing")) %>%
   count(word, sentiment, sort = TRUE) %>%
   acast(word ~ sentiment, value.var = "n", fill = 0) %>%
-  comparison.cloud(random.order = FALSE, colors = c("forestgreen", "darkolivegreen1"),
+  comparison.cloud(random.order = FALSE, colors = c("forestgreen", "gold"),
                    max.words = 120)
 ```
 
@@ -307,8 +308,7 @@ ggplot +
 ```
 
 ```{r}
-# Looking at the story arcs
-# Not sure what is going on with Persuasion though!
+# Just looking at Persuasion
 all_books2 %>%
   filter(book %in% c("Persuasion")) %>%
   #unnest_tokens(word, text) %>%
